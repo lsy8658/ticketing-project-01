@@ -46,14 +46,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(
                                         "/api/auth/signup",
-                                        "/api/auth/login",
-                                        "/api/artists",
-                                        "/api/artists/**",
-                                        "/api/concerts",
-                                        "/api/concerts/**",
-                                        "/api/seats/**",
-                                        "/api/seat-grades",
-                                        "/api/seat-grades/**"
+                                        "/api/auth/login"
+
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )
@@ -62,3 +56,8 @@ public class SecurityConfig {
     }
 
 }
+
+/*
+    "/api/concerts",
+    "/api/concerts/**"
+*/
