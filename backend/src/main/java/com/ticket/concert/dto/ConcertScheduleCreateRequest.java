@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 public class ConcertScheduleCreateRequest {
-    private Long concerId;
+    private Long concertId;
     private Long venueId;
     private LocalDateTime startAt;
 }

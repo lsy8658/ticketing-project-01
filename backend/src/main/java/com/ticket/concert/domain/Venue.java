@@ -19,4 +19,9 @@ public class Venue {
     private String name;
 
     private String address;
+
+    public Venue(String name, String address) {
+        this.name = name;
+        this.address = address;
+    }
 }

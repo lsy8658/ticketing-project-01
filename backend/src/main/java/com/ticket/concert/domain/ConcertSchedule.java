@@ -1,7 +1,7 @@
 package com.ticket.concert.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
+        import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
