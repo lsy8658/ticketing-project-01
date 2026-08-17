@@ -1,10 +1,8 @@
 package com.ticket.concert.config;
 
-import com.ticket.concert.config.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.SecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,8 +45,14 @@ public class SecurityConfig {
                         auth.requestMatchers(
                                         "/api/auth/signup",
                                         "/api/auth/login"
-
                                 ).permitAll()
+                                .requestMatchers(
+                                        "/api/concerts/**",
+                                        "/api/venues/**",
+                                        "/api/concert-schedules/**"
+                                ).hasRole("ADMIN")
+                                .requestMatchers("/api/user/**")
+                                .hasRole("USER")
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -56,8 +60,3 @@ public class SecurityConfig {
     }
 
 }
-
-/*
-    "/api/concerts",
-    "/api/concerts/**"
-*/
