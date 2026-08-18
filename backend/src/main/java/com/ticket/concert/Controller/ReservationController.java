@@ -1,14 +1,12 @@
 package com.ticket.concert.Controller;
 
 
+import com.ticket.concert.dto.ReservationCreateRequest;
 import com.ticket.concert.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,15 +14,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReservationController {
     private final ReservationService reservationService;
 
+    @PostMapping
     public ResponseEntity<Long> create(
-           Authentication authentication,
-           @RequestParam Long concertScheduleId
-    ) {
+            Authentication authentication,
+            @RequestBody ReservationCreateRequest request
+            ) {
         Long userId = (Long) authentication.getPrincipal();
 
         Long reservationId = reservationService.create(
                 userId,
-                concertScheduleId
+                request.getConcertScheduleId(),
+                request.getScheduleSeatIds()
         );
 
         return ResponseEntity.ok(reservationId);
