@@ -1,5 +1,8 @@
 package com.ticket.concert.dto;
 
+import lombok.Getter;
+
+@Getter
 public class SeatResponse {
     private Long id;
     private String seatNumber;

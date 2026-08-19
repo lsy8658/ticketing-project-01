@@ -49,7 +49,10 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/api/concerts/**",
                                         "/api/venues/**",
-                                        "/api/concert-schedules/**"
+                                        "/api/concert-schedules/**",
+                                        "/api/seat-grades/**",
+                                        "/api/seats/**",
+                                        "/api/reservations/**"
                                 ).hasRole("ADMIN")
                                 .requestMatchers("/api/user/**")
                                 .hasRole("USER")

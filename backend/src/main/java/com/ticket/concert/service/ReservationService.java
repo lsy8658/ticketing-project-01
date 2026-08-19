@@ -5,12 +5,17 @@ import com.ticket.concert.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -19,8 +24,13 @@ public class ReservationService {
     private final ScheduleSeatRepository scheduleSeatRepository;
     private final ReservationSeatRepository reservationSeatRepository;
     private final RedissonClient redissonClient;
+    private final StringRedisTemplate redisTemplate;
 
     public Long create(Long userId, Long concertScheduleId, List<Long> scheduleSeatIds) {
+
+        if (scheduleSeatIds.size() > 4) {
+            throw new RuntimeException("좌석은 최대 4매까지 예약 가능합니다.");
+        }
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
@@ -44,6 +54,20 @@ public class ReservationService {
             List<ScheduleSeat> scheduleSeats =
                     scheduleSeatRepository.findAllById(scheduleSeatIds);
 
+            for (ScheduleSeat scheduleSeat : scheduleSeats) {
+                if (scheduleSeat.getStatus() != SeatStatus.AVAILABLE) {
+                    throw new RuntimeException("이미 선택된 좌석이 있습니다.");
+                }
+            }
+            for (ScheduleSeat scheduleSeat : scheduleSeats) {
+                scheduleSeat.hold();
+                redisTemplate.opsForValue().set(
+                        "seat:hold:" + scheduleSeat.getId(),
+                        "HOLD",
+                        5,
+                        TimeUnit.MINUTES
+                );
+            }
             List<ReservationSeat> reservationSeats = scheduleSeats.stream()
                     .map(scheduleSeat ->
                             new ReservationSeat(savedReservation, scheduleSeat))

@@ -3,7 +3,6 @@ package com.ticket.concert.Controller;
 import com.ticket.concert.dto.SeatGradeCreateRequest;
 import com.ticket.concert.dto.SeatGradeResponse;
 import com.ticket.concert.service.SeatGradeService;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

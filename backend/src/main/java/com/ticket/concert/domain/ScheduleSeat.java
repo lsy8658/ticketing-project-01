@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -43,4 +45,5 @@ public class ScheduleSeat {
     public void release() {
         this.status = SeatStatus.AVAILABLE;
     }
+
 }

@@ -23,7 +23,6 @@ public class SeatService {
             Long seatGradeId,
             String seatNumber
     ) {
-
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new RuntimeException("공연장을 찾을 수 없습니다."));
 
@@ -35,7 +34,11 @@ public class SeatService {
                 seatGrade,
                 seatNumber
         );
+        Boolean exists = seatRepository.existsByVenueAndSeatNumber(venue, seatNumber);
 
+        if (exists) {
+            throw new RuntimeException("이미 존재하는 좌석입니다.");
+        }
         Seat savedSeat = seatRepository.save(seat);
 
         return new SeatResponse(
