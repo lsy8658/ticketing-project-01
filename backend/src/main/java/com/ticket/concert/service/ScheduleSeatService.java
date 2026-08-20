@@ -30,7 +30,7 @@ public class ScheduleSeatService {
         List<ScheduleSeat> scheduleSeats = seats.stream()
                 .map(seat -> new ScheduleSeat(schedule, seat))
                 .toList();
-
+        System.out.println("좌석 개수 :" + seats.size());
         scheduleSeatRepository.saveAll(scheduleSeats);
     }
 }

@@ -28,6 +28,8 @@ public class ScheduleSeat {
     @Column(nullable = false)
     private SeatStatus status;
 
+    private LocalDateTime holdAt;
+
     public ScheduleSeat(ConcertSchedule concertSchedule, Seat seat) {
         this.concertSchedule = concertSchedule;
         this.seat = seat;
@@ -36,6 +38,7 @@ public class ScheduleSeat {
 
     public void hold() {
         this.status = SeatStatus.HOLDING;
+        this.holdAt = LocalDateTime.now();
     }
 
     public void reserve() {
@@ -44,6 +47,7 @@ public class ScheduleSeat {
 
     public void release() {
         this.status = SeatStatus.AVAILABLE;
+        this.holdAt = null;
     }
 
 }
