@@ -21,7 +21,7 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
-
+        System.out.println("Redis 만료 감지 : " + new String(message.getBody()));
         String expiredKey = new String(message.getBody());
 
         if (!expiredKey.startsWith("seat:hold:")) {

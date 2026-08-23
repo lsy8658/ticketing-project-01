@@ -82,4 +82,11 @@ public class ReservationService {
             System.out.println("락 해제 완료");
         }
     }
+
+    public void release(Long scheduleSeatId) {
+
+        ScheduleSeat scheduleSeat = scheduleSeatRepository.findById(scheduleSeatId)
+                .orElseThrow(() -> new RuntimeException(("좌석을 찾을 수 없습니다.")));
+        scheduleSeat.release();
+    }
 }
