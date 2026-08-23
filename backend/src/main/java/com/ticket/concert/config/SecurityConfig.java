@@ -52,10 +52,12 @@ public class SecurityConfig {
                                         "/api/concert-schedules/**",
                                         "/api/seat-grades/**",
                                         "/api/seats/**",
-                                        "/api/reservations/**",
                                         "/api/schedule-seat/**"
                                 ).hasRole("ADMIN")
-                                .requestMatchers("/api/user/**")
+                                .requestMatchers(
+                                "/api/user/**",
+                                        "/api/reservations/**"
+                                )
                                 .hasRole("USER")
                                 .anyRequest().authenticated()
                 )
