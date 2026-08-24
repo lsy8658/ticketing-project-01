@@ -61,6 +61,8 @@ public class ReservationService {
             }
             for (ScheduleSeat scheduleSeat : scheduleSeats) {
                 scheduleSeat.hold();
+                System.out.println("Redis 저장 : " + scheduleSeat.getId());
+                System.out.println(redisTemplate.getConnectionFactory());
                 redisTemplate.opsForValue().set(
                         "seat:hold:" + scheduleSeat.getId(),
                         "HOLD",

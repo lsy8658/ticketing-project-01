@@ -55,10 +55,11 @@ public class SecurityConfig {
                                         "/api/schedule-seat/**"
                                 ).hasRole("ADMIN")
                                 .requestMatchers(
-                                "/api/user/**",
-                                        "/api/reservations/**"
+                                "/api/user/**"
                                 )
                                 .hasRole("USER")
+                                .requestMatchers("/api/reservations/**")
+                                .hasAnyRole("USER", "ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
