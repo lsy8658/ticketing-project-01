@@ -55,6 +55,10 @@ public class ReservationService {
                     scheduleSeatRepository.findAllById(scheduleSeatIds);
 
             for (ScheduleSeat scheduleSeat : scheduleSeats) {
+                if (scheduleSeat.getConcertSchedule().getId().equals(concertScheduleId)) {
+                    throw new RuntimeException("해당 공연 회자의 좌석이 아닙니다.");
+                }
+
                 if (scheduleSeat.getStatus() != SeatStatus.AVAILABLE) {
                     throw new RuntimeException("이미 선택된 좌석이 있습니다.");
                 }
@@ -67,7 +71,8 @@ public class ReservationService {
                         "seat:hold:" + scheduleSeat.getId(),
                         "HOLD",
                         5,
-                        TimeUnit.MINUTES
+                        TimeUnit.SECONDS
+//                        TimeUnit.MINUTES
                 );
             }
             List<ReservationSeat> reservationSeats = scheduleSeats.stream()

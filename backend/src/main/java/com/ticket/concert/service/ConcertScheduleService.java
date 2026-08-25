@@ -26,6 +26,10 @@ public class ConcertScheduleService {
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new RuntimeException("공연장을 찾을 수 없습니다."));
 
+        if (concertScheduleRepository.existsByVenueAndStartAt(venue, startAt)) {
+            throw new RuntimeException("이미 등록된 공연 일정입니다.");
+        }
+
         ConcertSchedule schedule = new ConcertSchedule(concert, venue, startAt);
 
         ConcertSchedule savedSchedule = concertScheduleRepository.save(schedule);
