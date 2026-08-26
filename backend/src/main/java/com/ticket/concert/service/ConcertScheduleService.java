@@ -3,9 +3,11 @@ package com.ticket.concert.service;
 
 import com.ticket.concert.domain.*;
 import com.ticket.concert.dto.ConcertScheduleResponse;
+import com.ticket.concert.dto.ConcertScheduleUpdateRequest;
 import com.ticket.concert.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,5 +44,19 @@ public class ConcertScheduleService {
         scheduleSeatRepository.saveAll(scheduleSeats);
 
         return ConcertScheduleResponse.from(savedSchedule);
+    }
+
+    public List<ConcertSchedule> getConcertSchedules(Long concertId) {
+        return concertScheduleRepository.findAllByConcertId(concertId);
+    }
+
+    @Transactional
+    public ConcertScheduleResponse update(Long scheduleId, ConcertScheduleUpdateRequest request) {
+        ConcertSchedule schedule = concertScheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new RuntimeException("공연 일정을 찾을 수 없습니다."));
+
+        schedule.updateStartAt(request.getStartAt());
+
+        return ConcertScheduleResponse.from(schedule);
     }
 }

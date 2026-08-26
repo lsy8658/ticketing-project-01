@@ -24,6 +24,9 @@ public class ScheduleSeatService {
         ConcertSchedule schedule = concertScheduleRepository.findById(concertScheduleId)
                 .orElseThrow(() -> new RuntimeException("회차 없음"));
 
+        if (scheduleSeatRepository.existsByConcertSchedule(schedule)) {
+            throw new RuntimeException("이미 해당 회차의 좌석이 등록되어 있습니다.");
+        }
         // 공연장소에 대한 좌석들
         List<Seat> seats = seatRepository.findAllByVenue(schedule.getVenue());
 

@@ -1,16 +1,15 @@
 package com.ticket.concert.Controller;
 
+import com.ticket.concert.domain.ConcertSchedule;
 import com.ticket.concert.dto.ConcertScheduleCreateRequest;
 import com.ticket.concert.dto.ConcertScheduleResponse;
+import com.ticket.concert.dto.ConcertScheduleUpdateRequest;
 import com.ticket.concert.service.ConcertScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/concert-schedules")
@@ -25,4 +24,20 @@ public class ConcertScheduleController {
         );
         return ResponseEntity.ok(schedule);
     }
+
+    @GetMapping("/{concertId}/schedules")
+    public ResponseEntity<List<ConcertSchedule>> getConcertSchedules (@PathVariable("concertId") Long concertId) {
+        List<ConcertSchedule> concertSchedules = concertScheduleService.getConcertSchedules(concertId);
+        return ResponseEntity.ok(concertSchedules);
+    }
+
+    @PutMapping("/{scheduleId}")
+    public ResponseEntity<ConcertScheduleResponse> updateConcertSchedule(
+            @PathVariable("scheduleId") Long scheduleId,
+            @RequestBody ConcertScheduleUpdateRequest request
+    ) {
+        ConcertScheduleResponse concertScheduleResponse = concertScheduleService.update(scheduleId, request);
+        return ResponseEntity.ok(concertScheduleResponse);
+    }
 }
+

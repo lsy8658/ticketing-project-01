@@ -31,4 +31,8 @@ public class ConcertSchedule {
         this.venue = venue;
         this.startAt = startAt;
     }
+
+    public void updateStartAt(LocalDateTime startAt) {
+        this.startAt = startAt;
+    }
 }
