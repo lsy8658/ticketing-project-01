@@ -3,9 +3,9 @@ package com.ticket.concert.service;
 import com.ticket.concert.domain.*;
 import com.ticket.concert.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -44,9 +45,10 @@ public class ReservationService {
                 .map(id -> redissonClient.getLock("seat:" + id))
                 .toList();
 
-        System.out.println("락 획득 시도");
+        log.info("락 획득 시도");
         locks.forEach(RLock::lock);
-        System.out.println("락 획득 완료");
+        log.info("락 획득 완료");
+
         try {
             Reservation reservation = new Reservation(user, concertSchedule);
             Reservation savedReservation = reservationRepository.save(reservation);
@@ -55,26 +57,29 @@ public class ReservationService {
                     scheduleSeatRepository.findAllById(scheduleSeatIds);
 
             for (ScheduleSeat scheduleSeat : scheduleSeats) {
-                if (scheduleSeat.getConcertSchedule().getId().equals(concertScheduleId)) {
-                    throw new RuntimeException("해당 공연 회자의 좌석이 아닙니다.");
+                if (!scheduleSeat.getConcertSchedule().getId().equals(concertScheduleId)) {
+                    throw new RuntimeException("해당 공연 회차의 좌석이 아닙니다.");
                 }
 
                 if (scheduleSeat.getStatus() != SeatStatus.AVAILABLE) {
                     throw new RuntimeException("이미 선택된 좌석이 있습니다.");
                 }
             }
+
             for (ScheduleSeat scheduleSeat : scheduleSeats) {
                 scheduleSeat.hold();
-                System.out.println("Redis 저장 : " + scheduleSeat.getId());
-                System.out.println(redisTemplate.getConnectionFactory());
+
+                log.info("Redis 저장 : {}", scheduleSeat.getId());
+                log.info("Connection Factory : {}", redisTemplate.getConnectionFactory());
+
                 redisTemplate.opsForValue().set(
                         "seat:hold:" + scheduleSeat.getId(),
                         "HOLD",
-                        5,
+                        10,
                         TimeUnit.SECONDS
-//                        TimeUnit.MINUTES
                 );
             }
+
             List<ReservationSeat> reservationSeats = scheduleSeats.stream()
                     .map(scheduleSeat ->
                             new ReservationSeat(savedReservation, scheduleSeat))
@@ -86,14 +91,31 @@ public class ReservationService {
 
         } finally {
             locks.forEach(RLock::unlock);
-            System.out.println("락 해제 완료");
+            log.info("락 해제 완료");
         }
     }
 
     public void release(Long scheduleSeatId) {
 
         ScheduleSeat scheduleSeat = scheduleSeatRepository.findById(scheduleSeatId)
-                .orElseThrow(() -> new RuntimeException(("좌석을 찾을 수 없습니다.")));
+                .orElseThrow(() -> new RuntimeException("좌석을 찾을 수 없습니다."));
+
         scheduleSeat.release();
+    }
+
+    public void cancelReservation(Long reservationId, Long userId) {
+
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RuntimeException("예약을 찾을 수 없습니다."));
+
+        if (!reservation.getUser().getId().equals(userId)) {
+            throw new RuntimeException("본인 예약만 취소할 수 있습니다.");
+        }
+
+        if (reservation.getStatus() == ReservationStatus.CANCELLED) {
+            throw new RuntimeException("이미 취소된 예약입니다.");
+        }
+
+        reservation.cancel();
     }
 }

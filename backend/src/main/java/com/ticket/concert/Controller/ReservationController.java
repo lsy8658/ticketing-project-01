@@ -1,9 +1,12 @@
 package com.ticket.concert.Controller;
 
 
+import com.ticket.concert.domain.Reservation;
 import com.ticket.concert.dto.ReservationCreateRequest;
 import com.ticket.concert.service.ReservationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +20,7 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<Long> create(
             Authentication authentication,
-            @RequestBody ReservationCreateRequest request
+            @Valid @RequestBody ReservationCreateRequest request
             ) {
         Long userId = (Long) authentication.getPrincipal();
 
@@ -27,7 +30,17 @@ public class ReservationController {
                 request.getScheduleSeatIds()
         );
 
-        return ResponseEntity.ok(reservationId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(reservationId);
     }
 
+    @PatchMapping("/{reservationId}")
+    public ResponseEntity<Void> cancel(
+            Authentication authentication,
+            @PathVariable("reservationId") Long reservationId
+    ) {
+        Long userId = (Long) authentication.getPrincipal();
+        reservationService.cancelReservation(reservationId,userId);
+
+        return ResponseEntity.noContent().build();
+    }
 }
