@@ -55,7 +55,8 @@ public class SecurityConfig {
                                         "/api/schedule-seat/**"
                                 ).hasRole("ADMIN")
                                 .requestMatchers(
-                                "/api/user/**"
+                                "/api/user/**",
+                                        "/api/payments/confirm"
                                 )
                                 .hasRole("USER")
                                 .requestMatchers("/api/reservations/**")
