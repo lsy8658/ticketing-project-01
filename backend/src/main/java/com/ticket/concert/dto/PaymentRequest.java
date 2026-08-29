@@ -9,4 +9,5 @@ public class PaymentRequest {
     private String paymentKey;
     private String orderId;
     private Long amount;
+    private Long reservationId;
 }

@@ -13,11 +13,11 @@ public class ConcertScheduleResponse {
     private VenueInfo venue;
     private LocalDateTime startAt;
 
-    public ConcertScheduleResponse (
-        Long id,
-        ConcertInfo concert,
-        VenueInfo venue,
-        LocalDateTime startAt
+    public ConcertScheduleResponse(
+            Long id,
+            ConcertInfo concert,
+            VenueInfo venue,
+            LocalDateTime startAt
     ) {
         this.id = id;
         this.concert = concert;
@@ -30,7 +30,8 @@ public class ConcertScheduleResponse {
                 schedule.getId(),
                 new ConcertInfo(
                         schedule.getConcert().getId(),
-                        schedule.getConcert().getTitle()),
+                        schedule.getConcert().getTitle()
+                ),
                 new VenueInfo(
                         schedule.getVenue().getId(),
                         schedule.getVenue().getName(),
@@ -57,7 +58,7 @@ public class ConcertScheduleResponse {
         private String name;
         private String address;
 
-        public VenueInfo (Long id, String name, String address) {
+        public VenueInfo(Long id, String name, String address) {
             this.id = id;
             this.name = name;
             this.address = address;
