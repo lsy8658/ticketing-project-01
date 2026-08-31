@@ -1,8 +1,6 @@
 package com.ticket.concert.service;
 
-import com.ticket.concert.domain.Payment;
-import com.ticket.concert.domain.Reservation;
-import com.ticket.concert.domain.ReservationSeat;
+import com.ticket.concert.domain.*;
 import com.ticket.concert.dto.PaymentRequest;
 import com.ticket.concert.repository.PaymentRepository;
 import com.ticket.concert.repository.ReservationRepository;
@@ -39,13 +37,50 @@ public class PaymentService {
 
 
     @Transactional
-    public void confirm(PaymentRequest request) {
+    public void confirm(PaymentRequest request, Long userId) {
         log.info("PaymentService.confirm 진입");
+
+        Reservation reservation = reservationRepository.findById(request.getReservationId())
+                .orElseThrow(() -> new RuntimeException("예약을 찾을 수 없습니다."));
+
+        if (reservation.getStatus() == ReservationStatus.CANCELLED) {
+            throw new RuntimeException("취소된 예약은 결제할 수 없습니다.");
+        }
+
+        if (!reservation.getUser().getId().equals(userId)) {
+            throw new RuntimeException("본인의 예약만 결제할 수 있습니다.");
+        }
 
         String encodedKey = Base64.getEncoder()
                 .encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
 
 
+        List<ReservationSeat> reservationSeats =
+                reservationSeatRepository.findAllByReservation(reservation);
+
+        if (request.getAmount() <= 0) {
+            throw new RuntimeException("결제 금액은 0원보다 커야 합니다.");
+        }
+        if (reservationSeats.isEmpty()) {
+            throw new RuntimeException("예약된 좌석이 없습니다.");
+        }
+        long actualAmount = reservationSeats.stream()
+                .mapToLong(reservationSeat -> reservationSeat.getScheduleSeat()
+                        .getSeat().getSeatGrade().getPrice()).sum();
+
+        if (request.getAmount() != actualAmount) {
+            throw new RuntimeException("결제 금액이 올바르지 않습니다.");
+        }
+
+        if (paymentRepository.existsByReservation(reservation)) {
+            throw new RuntimeException("이미 결제된 예약입니다.");
+        }
+
+        for (ReservationSeat reservationSeat: reservationSeats) {
+            if (reservationSeat.getScheduleSeat().getStatus() != SeatStatus.HOLDING) {
+                throw new RuntimeException("결제할 수 없는 좌석이 있습니다.");
+            }
+        }
         restClient.post()
                 .uri("https://api.tosspayments.com/v1/payments/confirm")
                 .header(HttpHeaders.AUTHORIZATION, "Basic " + encodedKey)
@@ -57,14 +92,12 @@ public class PaymentService {
                 ))
                 .retrieve()
                 .toBodilessEntity();
-        Reservation reservation = reservationRepository.findById(request.getReservationId())
-                .orElseThrow(() -> new RuntimeException("예약을 찾을 수 없습니다."));
+
 
         Payment payment = new Payment(reservation, request.getAmount());
         payment.complete();
         paymentRepository.save(payment);
 
-        List<ReservationSeat> reservationSeats = reservationSeatRepository.findAllByReservation(reservation);
 
         for (ReservationSeat reservationSeat : reservationSeats) {
             reservationSeat.getScheduleSeat().reserve();
