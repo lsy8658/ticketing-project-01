@@ -16,15 +16,17 @@ public class HealthController {
 
     @GetMapping("/health")
     public String health() {
-        // DB 깨우기
         jdbcTemplate.queryForObject("SELECT 1", Integer.class);
 
-        // Redis 깨우기
+        String redisStatus;
         try (RedisConnection connection =
                      stringRedisTemplate.getConnectionFactory().getConnection()) {
             connection.ping();
+            redisStatus = "UP";
+        } catch (Exception e) {
+            redisStatus = "DOWN";
         }
 
-        return "OK";
+        return "DB: UP, Redis: " + redisStatus;
     }
 }
