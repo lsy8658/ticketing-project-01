@@ -24,8 +24,12 @@ public class RedisKeyExpirationListener implements MessageListener {
 
     @PostConstruct
     public void register() {
-        listenerContainer.addMessageListener(this, new PatternTopic("__keyevent@*__:expired"));
-        System.out.println("Redis 만료 Listener 등록됨 (직접 구독 방식)");
+        try {
+            listenerContainer.addMessageListener(this, new PatternTopic("__keyevent@*__:expired"));
+            System.out.println("Redis 만료 Listener 등록됨 (직접 구독 방식)");
+        } catch (Exception e) {
+            System.out.println("Redis 연결 실패로 만료 Listener 등록 못함, 앱은 정상 기동함: " + e.getMessage());
+        }
     }
 
     @Override
@@ -41,4 +45,3 @@ public class RedisKeyExpirationListener implements MessageListener {
         reservationService.release(scheduleSeatId);
     }
 }
-
