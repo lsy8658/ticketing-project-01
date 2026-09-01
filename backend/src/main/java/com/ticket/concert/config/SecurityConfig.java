@@ -45,7 +45,10 @@ public class SecurityConfig {
                         auth.requestMatchers(
                                         "/api/auth/signup",
                                         "/api/auth/login",
-                                        "/health"
+                                        "/health",
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html",
+                                        "/v3/api-docs/**"
                                 ).permitAll()
                                 .requestMatchers(
                                         "/api/concerts/**",

@@ -4,6 +4,8 @@ import com.ticket.concert.domain.Seat;
 import com.ticket.concert.domain.SeatGrade;
 import com.ticket.concert.domain.Venue;
 import com.ticket.concert.dto.SeatResponse;
+import com.ticket.concert.exception.CustomException;
+import com.ticket.concert.exception.ErrorCode;
 import com.ticket.concert.repository.SeatGradeRepository;
 import com.ticket.concert.repository.SeatRepository;
 import com.ticket.concert.repository.VenueRepository;
@@ -24,10 +26,10 @@ public class SeatService {
             String seatNumber
     ) {
         Venue venue = venueRepository.findById(venueId)
-                .orElseThrow(() -> new RuntimeException("공연장을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
 
         SeatGrade seatGrade = seatGradeRepository.findById(seatGradeId)
-                .orElseThrow(() -> new RuntimeException("좌석 등급을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.SEAT_GRADE_NOT_FOUND));
 
         Seat seat = new Seat(
                 venue,
@@ -37,7 +39,7 @@ public class SeatService {
         Boolean exists = seatRepository.existsByVenueAndSeatNumber(venue, seatNumber);
 
         if (exists) {
-            throw new RuntimeException("이미 존재하는 좌석입니다.");
+            throw new CustomException(ErrorCode.SEAT_ALREADY_EXISTS);
         }
         Seat savedSeat = seatRepository.save(seat);
 

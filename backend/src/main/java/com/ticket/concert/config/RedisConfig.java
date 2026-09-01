@@ -17,21 +17,31 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int redisPort;
 
-    @Value("${spring.data.redis.username}")
+    @Value("${spring.data.redis.username:}")
     private String redisUsername;
 
-    @Value("${spring.data.redis.password}")
+    @Value("${spring.data.redis.password:}")
     private String redisPassword;
+
+    @Value("${spring.data.redis.ssl.enabled:false}")
+    private boolean sslEnabled;
 
     @Bean
     public LettuceConnectionFactory listenerConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisHost, redisPort);
-        config.setUsername(redisUsername);
-        config.setPassword(redisPassword);
+        if (redisUsername != null && !redisUsername.isEmpty()) {
+            config.setUsername(redisUsername);
+        }
+        if (redisPassword != null && !redisPassword.isEmpty()) {
+            config.setPassword(redisPassword);
+        }
 
-        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
-                .useSsl()
-                .build();
+        LettuceClientConfiguration.LettuceClientConfigurationBuilder builder =
+                LettuceClientConfiguration.builder();
+        if (sslEnabled) {
+            builder.useSsl();
+        }
+        LettuceClientConfiguration clientConfig = builder.build();
 
         return new LettuceConnectionFactory(config, clientConfig);
     }

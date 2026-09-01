@@ -2,6 +2,8 @@ package com.ticket.concert.service;
 
 import com.ticket.concert.domain.*;
 import com.ticket.concert.dto.PaymentRequest;
+import com.ticket.concert.exception.CustomException;
+import com.ticket.concert.exception.ErrorCode;
 import com.ticket.concert.repository.PaymentRepository;
 import com.ticket.concert.repository.ReservationRepository;
 import com.ticket.concert.repository.ReservationSeatRepository;
@@ -41,14 +43,14 @@ public class PaymentService {
         log.info("PaymentService.confirm 진입");
 
         Reservation reservation = reservationRepository.findById(request.getReservationId())
-                .orElseThrow(() -> new RuntimeException("예약을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
 
         if (reservation.getStatus() == ReservationStatus.CANCELLED) {
-            throw new RuntimeException("취소된 예약은 결제할 수 없습니다.");
+            throw new CustomException(ErrorCode.RESERVATION_CANCELLED);
         }
 
         if (!reservation.getUser().getId().equals(userId)) {
-            throw new RuntimeException("본인의 예약만 결제할 수 있습니다.");
+            throw new CustomException(ErrorCode.PAYMENT_FORBIDDEN);
         }
 
         String encodedKey = Base64.getEncoder()
@@ -59,26 +61,26 @@ public class PaymentService {
                 reservationSeatRepository.findAllByReservation(reservation);
 
         if (request.getAmount() <= 0) {
-            throw new RuntimeException("결제 금액은 0원보다 커야 합니다.");
+            throw new CustomException(ErrorCode.INVALID_PAYMENT_AMOUNT);
         }
         if (reservationSeats.isEmpty()) {
-            throw new RuntimeException("예약된 좌석이 없습니다.");
+            throw new CustomException(ErrorCode.RESERVATION_NOT_FOUND);
         }
         long actualAmount = reservationSeats.stream()
                 .mapToLong(reservationSeat -> reservationSeat.getScheduleSeat()
                         .getSeat().getSeatGrade().getPrice()).sum();
 
         if (request.getAmount() != actualAmount) {
-            throw new RuntimeException("결제 금액이 올바르지 않습니다.");
+            throw new CustomException(ErrorCode.INVALID_PAYMENT_AMOUNT);
         }
 
         if (paymentRepository.existsByReservation(reservation)) {
-            throw new RuntimeException("이미 결제된 예약입니다.");
+            throw new CustomException(ErrorCode.ALREADY_PAID);
         }
 
         for (ReservationSeat reservationSeat: reservationSeats) {
             if (reservationSeat.getScheduleSeat().getStatus() != SeatStatus.HOLDING) {
-                throw new RuntimeException("결제할 수 없는 좌석이 있습니다.");
+                throw new CustomException(ErrorCode.SEAT_NOT_HOLDING);
             }
         }
         restClient.post()

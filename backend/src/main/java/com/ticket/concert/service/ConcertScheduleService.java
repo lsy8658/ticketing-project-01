@@ -4,6 +4,8 @@ package com.ticket.concert.service;
 import com.ticket.concert.domain.*;
 import com.ticket.concert.dto.ConcertScheduleResponse;
 import com.ticket.concert.dto.ConcertScheduleUpdateRequest;
+import com.ticket.concert.exception.CustomException;
+import com.ticket.concert.exception.ErrorCode;
 import com.ticket.concert.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,13 +25,13 @@ public class ConcertScheduleService {
 
     public ConcertScheduleResponse create(Long concertId, Long venueId, LocalDateTime startAt) {
         Concert concert = concertRepository.findById(concertId)
-                .orElseThrow(() -> new RuntimeException("공연을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_NOT_FOUND));
 
         Venue venue = venueRepository.findById(venueId)
-                .orElseThrow(() -> new RuntimeException("공연장을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
 
         if (concertScheduleRepository.existsByVenueAndStartAt(venue, startAt)) {
-            throw new RuntimeException("이미 등록된 공연 일정입니다.");
+            throw new CustomException(ErrorCode.CONCERT_SCHEDULE_ALREADY_EXISTS);
         }
 
         ConcertSchedule schedule = new ConcertSchedule(concert, venue, startAt);
@@ -53,7 +55,7 @@ public class ConcertScheduleService {
     @Transactional
     public ConcertScheduleResponse update(Long scheduleId, ConcertScheduleUpdateRequest request) {
         ConcertSchedule schedule = concertScheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new RuntimeException("공연 일정을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_SCHEDULE_NOT_FOUND));
 
         schedule.updateStartAt(request.getStartAt());
 

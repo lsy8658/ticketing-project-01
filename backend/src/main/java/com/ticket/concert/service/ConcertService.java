@@ -3,6 +3,8 @@ package com.ticket.concert.service;
 import com.ticket.concert.domain.Concert;
 import com.ticket.concert.dto.ConcertResponse;
 import com.ticket.concert.dto.ConcertUpdateRequest;
+import com.ticket.concert.exception.CustomException;
+import com.ticket.concert.exception.ErrorCode;
 import com.ticket.concert.repository.ConcertRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,7 @@ public class ConcertService {
 
     public ConcertResponse findConcert(Long id) {
         Concert concert = concertRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException(("해당 콘서트가 없습니다.")));
+                .orElseThrow(() -> new CustomException((ErrorCode.CONCERT_NOT_FOUND)));
         return new ConcertResponse(concert.getId(),
                 concert.getTitle(),
                 concert.getDescription(),

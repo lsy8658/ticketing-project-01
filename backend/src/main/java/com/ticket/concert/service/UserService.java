@@ -2,6 +2,8 @@ package com.ticket.concert.service;
 
 import com.ticket.concert.domain.User;
 import com.ticket.concert.dto.UserResponse;
+import com.ticket.concert.exception.CustomException;
+import com.ticket.concert.exception.ErrorCode;
 import com.ticket.concert.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,8 +15,7 @@ public class UserService {
 
     public UserResponse findById(Long userId) {
          User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
          return new UserResponse(user.getId(), user.getEmail(), user.getNickname(), user.getRole());
     }
-
 }

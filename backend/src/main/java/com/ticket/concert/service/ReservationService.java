@@ -1,6 +1,8 @@
 package com.ticket.concert.service;
 
 import com.ticket.concert.domain.*;
+import com.ticket.concert.exception.CustomException;
+import com.ticket.concert.exception.ErrorCode;
 import com.ticket.concert.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,14 +32,14 @@ public class ReservationService {
     public Long create(Long userId, Long concertScheduleId, List<Long> scheduleSeatIds) {
 
         if (scheduleSeatIds.size() > 4) {
-            throw new RuntimeException("좌석은 최대 4매까지 예약 가능합니다.");
+            throw new CustomException(ErrorCode.RESERVATION_SEAT_LIMIT_EXCEEDED);
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         ConcertSchedule concertSchedule = concertScheduleRepository.findById(concertScheduleId)
-                .orElseThrow(() -> new RuntimeException("공연 회차를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_SCHEDULE_NOT_FOUND));
 
         scheduleSeatIds.sort(Long::compareTo);
 
@@ -58,11 +60,11 @@ public class ReservationService {
 
             for (ScheduleSeat scheduleSeat : scheduleSeats) {
                 if (!scheduleSeat.getConcertSchedule().getId().equals(concertScheduleId)) {
-                    throw new RuntimeException("해당 공연 회차의 좌석이 아닙니다.");
+                    throw new CustomException(ErrorCode.SCHEDULE_SEAT_MISMATCH);
                 }
 
                 if (scheduleSeat.getStatus() != SeatStatus.AVAILABLE) {
-                    throw new RuntimeException("이미 선택된 좌석이 있습니다.");
+                    throw new CustomException(ErrorCode.SEAT_ALREADY_TAKEN);
                 }
             }
 
@@ -98,7 +100,7 @@ public class ReservationService {
     public void release(Long scheduleSeatId) {
 
         ScheduleSeat scheduleSeat = scheduleSeatRepository.findById(scheduleSeatId)
-                .orElseThrow(() -> new RuntimeException("좌석을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.SCHEDULE_SEAT_NOT_FOUND));
 
         scheduleSeat.release();
     }
@@ -106,14 +108,14 @@ public class ReservationService {
     public void cancelReservation(Long reservationId, Long userId) {
 
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new RuntimeException("예약을 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
 
         if (!reservation.getUser().getId().equals(userId)) {
-            throw new RuntimeException("본인 예약만 취소할 수 있습니다.");
+            throw new CustomException(ErrorCode.RESERVATION_FORBIDDEN);
         }
 
         if (reservation.getStatus() == ReservationStatus.CANCELLED) {
-            throw new RuntimeException("이미 취소된 예약입니다.");
+            throw new CustomException(ErrorCode.RESERVATION_ALREADY_CANCELLED);
         }
 
         reservation.cancel();

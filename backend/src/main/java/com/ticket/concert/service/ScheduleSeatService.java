@@ -3,6 +3,8 @@ package com.ticket.concert.service;
 import com.ticket.concert.domain.ConcertSchedule;
 import com.ticket.concert.domain.ScheduleSeat;
 import com.ticket.concert.domain.Seat;
+import com.ticket.concert.exception.CustomException;
+import com.ticket.concert.exception.ErrorCode;
 import com.ticket.concert.repository.ConcertScheduleRepository;
 import com.ticket.concert.repository.ScheduleSeatRepository;
 import com.ticket.concert.repository.SeatRepository;
@@ -22,10 +24,10 @@ public class ScheduleSeatService {
     @Transactional
     public void create(Long concertScheduleId) {
         ConcertSchedule schedule = concertScheduleRepository.findById(concertScheduleId)
-                .orElseThrow(() -> new RuntimeException("회차 없음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_NOT_FOUND));
 
         if (scheduleSeatRepository.existsByConcertSchedule(schedule)) {
-            throw new RuntimeException("이미 해당 회차의 좌석이 등록되어 있습니다.");
+            throw new CustomException(ErrorCode.SCHEDULE_SEAT_ALREADY_EXISTS);
         }
         // 공연장소에 대한 좌석들
         List<Seat> seats = seatRepository.findAllByVenue(schedule.getVenue());
