@@ -21,3 +21,8 @@ spring:
       password: ${REDIS_PASSWORD}
       ssl:
         enabled: true
+
+cloudinary:
+  cloud-name: cgt7r3ab
+  api-key: 466694252493158
+  api-secret: ${CLOUDINARY_API_SECRET}

@@ -65,7 +65,8 @@ public class SecurityConfig {
                                         "/api/concert-schedules/**",
                                         "/api/seat-grades/**",
                                         "/api/seats/**",
-                                        "/api/schedule-seat/**"
+                                        "/api/schedule-seat/**",
+                                        "/api/images/**"
                                 ).hasAnyRole("MANAGER", "ADMIN")
                                 .requestMatchers(
                                         "/api/user/**",

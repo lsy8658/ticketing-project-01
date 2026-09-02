@@ -25,8 +25,9 @@ public enum ErrorCode {
     RESERVATION_CANCELLED(HttpStatus.BAD_REQUEST, "취소된 예약은 결제할 수 없습니다."),
     INVALID_PAYMENT_AMOUNT(HttpStatus.BAD_REQUEST, "결제 금액이 올바르지 않습니다."),
     ALREADY_PAID(HttpStatus.CONFLICT, "이미 결제된 예약입니다."),
-    SEAT_NOT_HOLDING(HttpStatus.BAD_REQUEST, "결제할 수 없는 좌석이 있습니다.");
-
+    SEAT_NOT_HOLDING(HttpStatus.BAD_REQUEST, "결제할 수 없는 좌석이 있습니다."),
+    IMAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 업로드에 실패했습니다."),
+    CONCERT_SCHEDULE_HAS_RESERVATION(HttpStatus.CONFLICT, "예약이 있는 회차는 삭제할 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;

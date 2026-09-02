@@ -24,9 +24,13 @@ public class ConcertImage {
     @Column(nullable = false)
     private int sortOrder;
 
-    public ConcertImage(Concert concert, String imageUrl, int sortOrder) {
+    @Column(nullable = false)
+    private String publicId;
+
+    public ConcertImage(Concert concert, String imageUrl, String publicId, int sortOrder) {
         this.concert = concert;
         this.imageUrl = imageUrl;
+        this.publicId = publicId;
         this.sortOrder = sortOrder;
     }
 }

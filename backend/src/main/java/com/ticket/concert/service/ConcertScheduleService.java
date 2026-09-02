@@ -22,6 +22,7 @@ public class ConcertScheduleService {
     private final VenueRepository venueRepository;
     private final SeatRepository seatRepository;
     private final ScheduleSeatRepository scheduleSeatRepository;
+    private final ReservationRepository reservationRepository;
 
     public ConcertScheduleResponse create(Long concertId, Long venueId, LocalDateTime startAt) {
         Concert concert = concertRepository.findById(concertId)
@@ -60,5 +61,16 @@ public class ConcertScheduleService {
         schedule.updateStartAt(request.getStartAt());
 
         return ConcertScheduleResponse.from(schedule);
+    }
+    public void delete(Long scheduleId) {
+        ConcertSchedule schedule = concertScheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_SCHEDULE_NOT_FOUND));
+
+        if (reservationRepository.existsByConcertSchedule(schedule)) {
+            throw new CustomException(ErrorCode.CONCERT_SCHEDULE_HAS_RESERVATION);
+        }
+
+        scheduleSeatRepository.deleteAllByConcertSchedule(schedule);
+        concertScheduleRepository.delete(schedule);
     }
 }

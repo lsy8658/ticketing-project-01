@@ -11,5 +11,5 @@ public class ConcertUpdateRequest {
     private String title;
     private String description;
     private String imageUrl;
-    private List<String> imageUrls;
+    private List<ImageInfo> images;
 }

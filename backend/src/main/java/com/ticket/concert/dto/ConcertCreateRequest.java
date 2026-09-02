@@ -15,5 +15,5 @@ public class ConcertCreateRequest {
 
     @NotBlank(message = "이미지 url을 입력해주세요.")
     private String imageUrl;
-    private List<String> imageUrls;
+    private List<ImageInfo> images;
 }

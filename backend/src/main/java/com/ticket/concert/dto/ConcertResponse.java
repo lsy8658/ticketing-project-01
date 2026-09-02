@@ -11,14 +11,14 @@ public class ConcertResponse {
     private String title;
     private String description;
     private String imageUrl;
-    private List<String> imageUrls;
+    private List<ImageInfo> images;
 
-    public ConcertResponse(Long id, String title, String description, String imageUrl, List<String> imageUrls) {
+    public ConcertResponse(Long id, String title, String description, String imageUrl, List<ImageInfo> images) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.imageUrl = imageUrl;
-        this.imageUrls = imageUrls;
+        this.images = images;
 
     }
 }

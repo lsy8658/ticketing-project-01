@@ -39,5 +39,10 @@ public class ConcertScheduleController {
         ConcertScheduleResponse concertScheduleResponse = concertScheduleService.update(scheduleId, request);
         return ResponseEntity.ok(concertScheduleResponse);
     }
+    @DeleteMapping("/{scheduleId}")
+    public ResponseEntity<Void> deleteConcertSchedule(@PathVariable("scheduleId") Long scheduleId) {
+        concertScheduleService.delete(scheduleId);
+        return ResponseEntity.noContent().build();
+    }
 }
 

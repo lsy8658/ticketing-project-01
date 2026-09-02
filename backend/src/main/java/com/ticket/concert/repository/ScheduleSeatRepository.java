@@ -10,4 +10,5 @@ import java.util.List;
 public interface ScheduleSeatRepository  extends JpaRepository<ScheduleSeat, Long> {
     List<ScheduleSeat> findAllByStatus(SeatStatus status);
     boolean existsByConcertSchedule(ConcertSchedule concertSchedule);
+    void deleteAllByConcertSchedule(ConcertSchedule concertSchedule);
 }

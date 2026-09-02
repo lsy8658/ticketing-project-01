@@ -4,6 +4,7 @@ import com.ticket.concert.domain.Concert;
 import com.ticket.concert.domain.ConcertImage;
 import com.ticket.concert.dto.ConcertResponse;
 import com.ticket.concert.dto.ConcertUpdateRequest;
+import com.ticket.concert.dto.ImageInfo;
 import com.ticket.concert.exception.CustomException;
 import com.ticket.concert.exception.ErrorCode;
 import com.ticket.concert.repository.ConcertImageRepository;
@@ -18,14 +19,17 @@ import java.util.List;
 public class ConcertService {
     private final ConcertRepository concertRepository;
     private final ConcertImageRepository concertImageRepository;
+    private final ImageUploadService imageUploadService;
 
-    private List<String> getImageUrls (Concert concert) {
-        List<String> imageUrls = concertImageRepository
+    private List<ImageInfo> getImages(Concert concert) {
+        return concertImageRepository
                 .findAllByConcertOrderBySortOrderAsc(concert)
-                .stream().map(ConcertImage::getImageUrl).toList();
-        return imageUrls;
+                .stream()
+                .map(image -> new ImageInfo(image.getImageUrl(), image.getPublicId()))
+                .toList();
     }
-    public Long create (String title, String description, String imageUrl, List<String> imageUrls) {
+
+    public Long create(String title, String description, String imageUrl, List<ImageInfo> images) {
         Concert concert = Concert.builder()
                 .title(title)
                 .description(description)
@@ -33,9 +37,10 @@ public class ConcertService {
                 .build();
         Concert savedConcert = concertRepository.save(concert);
 
-        if (imageUrls != null) {
-            for (int i = 0; i < imageUrls.size(); i++) {
-                ConcertImage image = new ConcertImage(savedConcert, imageUrls.get(i), i);
+        if (images != null) {
+            for (int i = 0; i < images.size(); i++) {
+                ImageInfo info = images.get(i);
+                ConcertImage image = new ConcertImage(savedConcert, info.getUrl(), info.getPublicId(), i);
                 concertImageRepository.save(image);
             }
         }
@@ -45,19 +50,18 @@ public class ConcertService {
 
     public ConcertResponse findConcert(Long id) {
         Concert concert = concertRepository.findById(id)
-                .orElseThrow(() -> new CustomException((ErrorCode.CONCERT_NOT_FOUND)));
+                .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_NOT_FOUND));
 
-        List<String> imageUrls = getImageUrls(concert);
+        List<ImageInfo> images = getImages(concert);
         return new ConcertResponse(concert.getId(), concert.getTitle(),
-                concert.getDescription(), concert.getImageUrl(), imageUrls);
+                concert.getDescription(), concert.getImageUrl(), images);
     }
 
     public List<ConcertResponse> findAll() {
         return concertRepository.findAll().stream().map(concert -> {
-
-            List<String> imageUrls = getImageUrls(concert);
+            List<ImageInfo> images = getImages(concert);
             return new ConcertResponse(concert.getId(), concert.getTitle(),
-                    concert.getDescription(), concert.getImageUrl(), imageUrls);
+                    concert.getDescription(), concert.getImageUrl(), images);
         }).toList();
     }
 
@@ -67,19 +71,40 @@ public class ConcertService {
 
         concert.update(request.getTitle(), request.getDescription(), request.getImageUrl());
 
+        List<ConcertImage> oldImages = concertImageRepository.findAllByConcertOrderBySortOrderAsc(concert);
+        List<ImageInfo> newImages = request.getImages();
+
+        List<String> newPublicIds = newImages == null
+                ? List.of()
+                : newImages.stream().map(ImageInfo::getPublicId).toList();
+
+        for (ConcertImage oldImage : oldImages) {
+            if (!newPublicIds.contains(oldImage.getPublicId())) {
+                imageUploadService.delete(oldImage.getPublicId());
+            }
+        }
         concertImageRepository.deleteAllByConcert(concert);
-        List<String> newUrls = request.getImageUrls();
-        if (newUrls != null) {
-            for (int i = 0; i < newUrls.size(); i++) {
-                concertImageRepository.save(new ConcertImage(concert, newUrls.get(i), i));
+        if (newImages != null) {
+            for (int i = 0; i < newImages.size(); i++) {
+                ImageInfo info = newImages.get(i);
+                concertImageRepository.save(new ConcertImage(concert, info.getUrl(), info.getPublicId(), i));
             }
         }
 
         return new ConcertResponse(id, request.getTitle(), request.getDescription(),
-                request.getImageUrl(), newUrls);
+                request.getImageUrl(), newImages);
     }
 
     public void delete(Long id) {
+        Concert concert = concertRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_NOT_FOUND));
+
+        List<ConcertImage> images = concertImageRepository.findAllByConcertOrderBySortOrderAsc(concert);
+        for (ConcertImage image : images) {
+            imageUploadService.delete(image.getPublicId());
+        }
+        concertImageRepository.deleteAllByConcert(concert);
+
         concertRepository.deleteById(id);
     }
 }

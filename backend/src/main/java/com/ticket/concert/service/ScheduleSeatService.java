@@ -24,7 +24,7 @@ public class ScheduleSeatService {
     @Transactional
     public void create(Long concertScheduleId) {
         ConcertSchedule schedule = concertScheduleRepository.findById(concertScheduleId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_SCHEDULE_NOT_FOUND));
 
         if (scheduleSeatRepository.existsByConcertSchedule(schedule)) {
             throw new CustomException(ErrorCode.SCHEDULE_SEAT_ALREADY_EXISTS);
