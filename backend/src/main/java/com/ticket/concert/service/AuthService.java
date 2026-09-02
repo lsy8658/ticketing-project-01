@@ -15,15 +15,20 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public Long signUp(String email, String password, String nickname) {
+    public Long signUp(String email, String password, String nickname, UserRole role) {
         userRepository.findByEmail(email)
                 .ifPresent(m -> {throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);});
+
+        if (role == UserRole.ADMIN) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
 
         User user = User.builder()
                 .email(email)
                 .nickname(nickname)
                 .password(passwordEncoder.encode(password))
-                .role(UserRole.USER)
+                .role(role)
                 .build();
         return userRepository.save(user).getId();
     }

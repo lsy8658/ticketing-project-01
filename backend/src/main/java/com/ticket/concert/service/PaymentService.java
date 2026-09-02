@@ -7,6 +7,7 @@ import com.ticket.concert.exception.ErrorCode;
 import com.ticket.concert.repository.PaymentRepository;
 import com.ticket.concert.repository.ReservationRepository;
 import com.ticket.concert.repository.ReservationSeatRepository;
+import com.ticket.concert.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +37,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final ReservationRepository reservationRepository;
     private final ReservationSeatRepository reservationSeatRepository;
-
+    private final UserRepository userRepository;
 
     @Transactional
     public void confirm(PaymentRequest request, Long userId) {
@@ -104,5 +105,13 @@ public class PaymentService {
         for (ReservationSeat reservationSeat : reservationSeats) {
             reservationSeat.getScheduleSeat().reserve();
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<Payment> getMyPayments(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return paymentRepository.findAllByReservation_User(user);
     }
 }

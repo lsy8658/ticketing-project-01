@@ -1,8 +1,9 @@
 package com.ticket.concert.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 public class ConcertCreateRequest {
@@ -14,4 +15,5 @@ public class ConcertCreateRequest {
 
     @NotBlank(message = "이미지 url을 입력해주세요.")
     private String imageUrl;
+    private List<String> imageUrls;
 }

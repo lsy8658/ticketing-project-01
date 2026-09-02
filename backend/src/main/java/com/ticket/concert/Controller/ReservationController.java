@@ -11,11 +11,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reservations")
 public class ReservationController {
     private final ReservationService reservationService;
+
+    @GetMapping
+    public ResponseEntity<List<Reservation>> getMyReservations(
+            Authentication authentication
+    ) {
+        Long userId = (Long) authentication.getPrincipal();
+        List<Reservation> reservations = reservationService.getMyReservation(userId);
+        return ResponseEntity.ok(reservations);
+    }
 
     @PostMapping
     public ResponseEntity<Long> create(
@@ -43,4 +54,5 @@ public class ReservationController {
 
         return ResponseEntity.noContent().build();
     }
+
 }

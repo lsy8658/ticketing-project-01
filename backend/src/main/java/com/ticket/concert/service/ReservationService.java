@@ -120,4 +120,11 @@ public class ReservationService {
 
         reservation.cancel();
     }
+
+    public List<Reservation> getMyReservation(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return reservationRepository.findAllByUser(user);
+    }
 }

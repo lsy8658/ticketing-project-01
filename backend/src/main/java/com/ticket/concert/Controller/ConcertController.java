@@ -20,7 +20,7 @@ public class ConcertController {
 
     @PostMapping
     public ResponseEntity<Long> createConcert (@Valid @RequestBody ConcertCreateRequest request) {
-        Long id = concertService.create(request.getTitle(), request.getDescription(), request.getImageUrl());
+        Long id = concertService.create(request.getTitle(), request.getDescription(), request.getImageUrl(), request.getImageUrls());
         return ResponseEntity.ok(id);
     }
 

@@ -22,7 +22,7 @@ public class AuthController {
     private final JwtProvider jwtProvider;
     @PostMapping("/signup")
     public ResponseEntity<Long> signup(@RequestBody SignupRequest request) {
-        Long id = authService.signUp(request.getEmail(), request.getPassword(), request.getNickname());
+        Long id = authService.signUp(request.getEmail(), request.getPassword(), request.getNickname(), request.getRole());
         return ResponseEntity.ok(id);
     }
 
