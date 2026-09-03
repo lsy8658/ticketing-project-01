@@ -1,0 +1,23 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 360px;
+  padding: 32px;
+}
+
+@media (max-width: 480px) {
+  .form {
+    padding: 20px;
+    max-width: 100%;
+  }
+}
