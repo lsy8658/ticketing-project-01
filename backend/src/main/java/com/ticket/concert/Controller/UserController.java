@@ -1,14 +1,14 @@
 package com.ticket.concert.Controller;
 
 import com.ticket.concert.domain.User;
+import com.ticket.concert.dto.RoleUpdateRequest;
 import com.ticket.concert.dto.UserResponse;
 import com.ticket.concert.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
@@ -22,5 +22,14 @@ public class UserController {
         UserResponse user = userService.findById(userId);
 
         return ResponseEntity.ok(user);
+    }
+
+    @PatchMapping("/{userId}/role")
+    public ResponseEntity<Void> updateRole(
+            @PathVariable("userId") Long userId,
+            @Valid @RequestBody RoleUpdateRequest request
+            ) {
+        userService.updateRole(userId, request.getRole());
+        return ResponseEntity.noContent().build();
     }
 }

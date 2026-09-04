@@ -1,12 +1,12 @@
 package com.ticket.concert.Controller;
 
-
 import com.ticket.concert.config.JwtProvider;
 import com.ticket.concert.domain.User;
 import com.ticket.concert.dto.LoginRequest;
 import com.ticket.concert.dto.SignupRequest;
 import com.ticket.concert.service.AuthService;
 import com.ticket.concert.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,9 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthService authService;
     private final JwtProvider jwtProvider;
+
     @PostMapping("/signup")
-    public ResponseEntity<Long> signup(@RequestBody SignupRequest request) {
-        Long id = authService.signUp(request.getEmail(), request.getPassword(), request.getNickname(), request.getRole());
+    public ResponseEntity<Long> signup(@Valid @RequestBody SignupRequest request) {
+        Long id = authService.signUp(request.getEmail(), request.getPassword(), request.getNickname());
         return ResponseEntity.ok(id);
     }
 

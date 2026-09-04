@@ -34,4 +34,8 @@ public class User {
         this.nickname = nickname;
         this.role = role;
     }
+
+    public void changeRole(UserRole role) {
+        this.role = role;
+    }
 }
