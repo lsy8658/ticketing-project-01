@@ -9,7 +9,7 @@ type FormInputProps = {
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 };
 
-const FormInput = ({
+export const FormInput = ({
   type,
   name,
   placeholder,
@@ -28,5 +28,3 @@ const FormInput = ({
     />
   );
 };
-
-export default FormInput;

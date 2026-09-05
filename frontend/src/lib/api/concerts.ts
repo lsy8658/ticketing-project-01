@@ -1,13 +1,10 @@
 import { Concert } from "@/types/concert";
+import { fetchClient } from "../fetchClient";
 
 export const getConcerts = async (): Promise<Concert[]> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}`, {
+  const data = await fetchClient<Concert[]>("api/concerts", {
     next: { revalidate: 60 },
   });
 
-  if (!res.ok) {
-    return [];
-  }
-
-  return res.json();
+  return data ?? [];
 };

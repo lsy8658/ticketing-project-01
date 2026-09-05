@@ -3,4 +3,5 @@ export type Concert = {
   title: string;
   description: string;
   imageUrl: string;
+  images: { url: string; publicId: string }[];
 };
