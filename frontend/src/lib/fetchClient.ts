@@ -3,7 +3,7 @@ export const fetchClient = async <T>(
   options?: RequestInit,
 ): Promise<T | null> => {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/${path}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/${path}`,
     options,
   );
 

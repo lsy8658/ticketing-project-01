@@ -1,0 +1,27 @@
+.scheduleList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.scheduleItem {
+  padding: 16px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.selected {
+  border-color: var(--color-accent);
+  background-color: rgba(255, 46, 136, 0.1);
+}
+
+@media (max-width: 480px) {
+  .scheduleItem {
+    padding: 12px;
+    font-size: 14px;
+  }
+}
