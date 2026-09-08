@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class SeatGradeCreateRequest {
+    private Long concertId;
     private String name;
     private Long price;
 }

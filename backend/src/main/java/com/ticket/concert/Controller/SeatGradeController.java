@@ -5,10 +5,9 @@ import com.ticket.concert.dto.SeatGradeResponse;
 import com.ticket.concert.service.SeatGradeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,10 +21,19 @@ public class SeatGradeController {
             @RequestBody SeatGradeCreateRequest request
     ) {
         SeatGradeResponse response = seatGradeService.create(
+                request.getConcertId(),
                 request.getName(),
                 request.getPrice()
         );
 
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/concerts/{concertId}")
+    public ResponseEntity<List<SeatGradeResponse>> getByConcert (
+            @PathVariable("concertId") Long concertId
+    ) {
+        List<SeatGradeResponse> response = seatGradeService.findAllByConcert(concertId);
         return ResponseEntity.ok(response);
     }
 }
