@@ -6,6 +6,7 @@ import com.ticket.concert.dto.PaymentRequest;
 import com.ticket.concert.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +36,6 @@ public class PaymentController {
     ) {
         Long userId = (Long) authentication.getPrincipal();
         paymentService.confirm(request, userId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

@@ -11,6 +11,7 @@ import com.ticket.concert.repository.ConcertImageRepository;
 import com.ticket.concert.repository.ConcertRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -64,7 +65,7 @@ public class ConcertService {
                     concert.getDescription(), concert.getImageUrl(), images);
         }).toList();
     }
-
+    @Transactional
     public ConcertResponse update(Long id, ConcertUpdateRequest request) {
         Concert concert = concertRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_NOT_FOUND));
@@ -95,6 +96,7 @@ public class ConcertService {
                 request.getImageUrl(), newImages);
     }
 
+    @Transactional
     public void delete(Long id) {
         Concert concert = concertRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_NOT_FOUND));

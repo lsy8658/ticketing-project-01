@@ -3,7 +3,9 @@ package com.ticket.concert.Controller;
 import com.ticket.concert.dto.SeatCreateRequest;
 import com.ticket.concert.dto.SeatResponse;
 import com.ticket.concert.service.SeatService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,9 +19,8 @@ public class SeatController {
     private final SeatService seatService;
 
     @PostMapping
-    public ResponseEntity<SeatResponse> create(@RequestBody SeatCreateRequest request) {
+    public ResponseEntity<SeatResponse> create(@Valid @RequestBody SeatCreateRequest request) {
         SeatResponse seat = seatService.create(request.getVenueId(), request.getSeatGradeId(), request.getSeatNumber());
-        return ResponseEntity.ok(seat);
+        return ResponseEntity.status(HttpStatus.CREATED).body(seat);
     }
-
 }

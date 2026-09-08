@@ -16,12 +16,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ScheduleSeatService {
     private final ScheduleSeatRepository scheduleSeatRepository;
     private final ConcertScheduleRepository concertScheduleRepository;
     private final SeatRepository seatRepository;
 
-    @Transactional
     public void create(Long concertScheduleId) {
         ConcertSchedule schedule = concertScheduleRepository.findById(concertScheduleId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_SCHEDULE_NOT_FOUND));
@@ -29,13 +29,13 @@ public class ScheduleSeatService {
         if (scheduleSeatRepository.existsByConcertSchedule(schedule)) {
             throw new CustomException(ErrorCode.SCHEDULE_SEAT_ALREADY_EXISTS);
         }
-        // 공연장소에 대한 좌석들
+
         List<Seat> seats = seatRepository.findAllByVenue(schedule.getVenue());
 
         List<ScheduleSeat> scheduleSeats = seats.stream()
                 .map(seat -> new ScheduleSeat(schedule, seat))
                 .toList();
-        System.out.println("좌석 개수 :" + seats.size());
+
         scheduleSeatRepository.saveAll(scheduleSeats);
     }
 }

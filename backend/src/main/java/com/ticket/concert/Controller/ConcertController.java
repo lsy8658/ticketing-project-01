@@ -1,12 +1,12 @@
 package com.ticket.concert.Controller;
 
-import com.ticket.concert.domain.Concert;
 import com.ticket.concert.dto.ConcertCreateRequest;
 import com.ticket.concert.dto.ConcertResponse;
 import com.ticket.concert.dto.ConcertUpdateRequest;
 import com.ticket.concert.service.ConcertService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +19,9 @@ public class ConcertController {
     private final ConcertService concertService;
 
     @PostMapping
-    public ResponseEntity<Long> createConcert (@Valid @RequestBody ConcertCreateRequest request) {
+    public ResponseEntity<Long> createConcert(@Valid @RequestBody ConcertCreateRequest request) {
         Long id = concertService.create(request.getTitle(), request.getDescription(), request.getImageUrl(), request.getImages());
-        return ResponseEntity.ok(id);
+        return ResponseEntity.status(HttpStatus.CREATED).body(id);
     }
 
     @GetMapping("/{id}")

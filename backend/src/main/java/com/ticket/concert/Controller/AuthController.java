@@ -8,6 +8,7 @@ import com.ticket.concert.service.AuthService;
 import com.ticket.concert.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,11 +25,11 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<Long> signup(@Valid @RequestBody SignupRequest request) {
         Long id = authService.signUp(request.getEmail(), request.getPassword(), request.getNickname());
-        return ResponseEntity.ok(id);
+        return ResponseEntity.status(HttpStatus.CREATED).body(id);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest request) {
         User user = authService.login(request.getEmail(), request.getPassword());
         String token = jwtProvider.createToken(user.getId(), user.getEmail(), user.getRole());
         return ResponseEntity.ok(token);

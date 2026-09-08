@@ -5,7 +5,9 @@ import com.ticket.concert.dto.ConcertScheduleCreateRequest;
 import com.ticket.concert.dto.ConcertScheduleResponse;
 import com.ticket.concert.dto.ConcertScheduleUpdateRequest;
 import com.ticket.concert.service.ConcertScheduleService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,11 +20,11 @@ public class ConcertScheduleController {
     private final ConcertScheduleService concertScheduleService;
 
     @PostMapping
-    public ResponseEntity<ConcertScheduleResponse> createConcertSchedule(@RequestBody ConcertScheduleCreateRequest request) {
+    public ResponseEntity<ConcertScheduleResponse> createConcertSchedule(@Valid @RequestBody ConcertScheduleCreateRequest request) {
         ConcertScheduleResponse schedule = concertScheduleService.create(
-                request.getConcertId() , request.getVenueId(), request.getStartAt()
+                request.getConcertId(), request.getVenueId(), request.getStartAt()
         );
-        return ResponseEntity.ok(schedule);
+        return ResponseEntity.status(HttpStatus.CREATED).body(schedule);
     }
 
     @GetMapping("/{concertId}/schedules")

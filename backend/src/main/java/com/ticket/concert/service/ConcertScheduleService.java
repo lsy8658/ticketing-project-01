@@ -24,6 +24,7 @@ public class ConcertScheduleService {
     private final ScheduleSeatRepository scheduleSeatRepository;
     private final ReservationRepository reservationRepository;
 
+    @Transactional
     public ConcertScheduleResponse create(Long concertId, Long venueId, LocalDateTime startAt) {
         Concert concert = concertRepository.findById(concertId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_NOT_FOUND));
@@ -62,6 +63,8 @@ public class ConcertScheduleService {
 
         return ConcertScheduleResponse.from(schedule);
     }
+
+    @Transactional
     public void delete(Long scheduleId) {
         ConcertSchedule schedule = concertScheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_SCHEDULE_NOT_FOUND));
