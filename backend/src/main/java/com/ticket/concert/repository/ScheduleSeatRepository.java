@@ -11,4 +11,5 @@ public interface ScheduleSeatRepository  extends JpaRepository<ScheduleSeat, Lon
     List<ScheduleSeat> findAllByStatus(SeatStatus status);
     boolean existsByConcertSchedule(ConcertSchedule concertSchedule);
     void deleteAllByConcertSchedule(ConcertSchedule concertSchedule);
+    List<ScheduleSeat> findAllByConcertScheduleId(Long concertScheduleId);
 }

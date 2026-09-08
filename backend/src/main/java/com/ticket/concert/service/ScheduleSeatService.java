@@ -3,6 +3,7 @@ package com.ticket.concert.service;
 import com.ticket.concert.domain.ConcertSchedule;
 import com.ticket.concert.domain.ScheduleSeat;
 import com.ticket.concert.domain.Seat;
+import com.ticket.concert.dto.ScheduleSeatResponse;
 import com.ticket.concert.exception.CustomException;
 import com.ticket.concert.exception.ErrorCode;
 import com.ticket.concert.repository.ConcertScheduleRepository;
@@ -37,5 +38,12 @@ public class ScheduleSeatService {
                 .toList();
 
         scheduleSeatRepository.saveAll(scheduleSeats);
+    }
+
+    public List<ScheduleSeatResponse> findAllByConcertSchedule(Long concertScheduleId) {
+        List<ScheduleSeat> scheduleSeats = scheduleSeatRepository.findAllByConcertScheduleId(concertScheduleId);
+        return scheduleSeats.stream()
+                .map(ScheduleSeatResponse::from)
+                .toList();
     }
 }
