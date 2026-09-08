@@ -3,6 +3,7 @@ package com.ticket.concert.Controller;
 
 import com.ticket.concert.domain.Reservation;
 import com.ticket.concert.dto.ReservationCreateRequest;
+import com.ticket.concert.dto.ReservationDetailResponse;
 import com.ticket.concert.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,16 @@ public class ReservationController {
         Long userId = (Long) authentication.getPrincipal();
         List<Reservation> reservations = reservationService.getMyReservation(userId);
         return ResponseEntity.ok(reservations);
+    }
+
+    @GetMapping("/{reservationId}")
+    public ResponseEntity<ReservationDetailResponse> getReservationDetail(
+            Authentication authentication,
+            @PathVariable("reservationId") Long reservationId
+    ) {
+        Long userId = (Long) authentication.getPrincipal();
+        ReservationDetailResponse response = reservationService.getReservationDetail(reservationId, userId);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping

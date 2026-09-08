@@ -1,6 +1,7 @@
 package com.ticket.concert.service;
 
 import com.ticket.concert.domain.*;
+import com.ticket.concert.dto.ReservationDetailResponse;
 import com.ticket.concert.exception.CustomException;
 import com.ticket.concert.exception.ErrorCode;
 import com.ticket.concert.repository.*;
@@ -77,8 +78,8 @@ public class ReservationService {
                 redisTemplate.opsForValue().set(
                         "seat:hold:" + scheduleSeat.getId(),
                         "HOLD",
-                        10,
-                        TimeUnit.SECONDS
+                        2,
+                        TimeUnit.MINUTES
                 );
             }
 
@@ -95,6 +96,32 @@ public class ReservationService {
             locks.forEach(RLock::unlock);
             log.info("락 해제 완료");
         }
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationDetailResponse getReservationDetail(Long reservationId, Long userId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
+
+        if (!reservation.getUser().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.RESERVATION_FORBIDDEN);
+        }
+
+        List<ReservationSeat> reservationSeats =
+                reservationSeatRepository.findAllByReservation(reservation);
+
+        List<ReservationDetailResponse.SeatInfo> seatInfos = reservationSeats.stream()
+                .map(rs -> new ReservationDetailResponse.SeatInfo(
+                        rs.getScheduleSeat().getSeat().getSeatNumber(),
+                        rs.getScheduleSeat().getSeat().getSeatGrade().getName(),
+                        rs.getScheduleSeat().getSeat().getSeatGrade().getPrice()
+                ))
+                .toList();
+
+        long totalAmount = seatInfos.stream()
+                .mapToLong(ReservationDetailResponse.SeatInfo::getPrice).sum();
+
+        return new ReservationDetailResponse(reservationId,seatInfos,totalAmount);
     }
 
     public void release(Long scheduleSeatId) {
