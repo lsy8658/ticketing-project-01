@@ -5,3 +5,10 @@ export type Concert = {
   imageUrl: string;
   images: { url: string; publicId: string }[];
 };
+
+export type ConcertCreateRequest = {
+  title: string;
+  description: string;
+  imageUrl: string;
+  images?: { url: string; publicId: string }[];
+};

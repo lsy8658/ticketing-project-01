@@ -5,9 +5,14 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "placehold.co",
+      },
+      {
+        protocol: "https",
         hostname: "res.cloudinary.com",
       },
     ],
+    dangerouslyAllowSVG: true,
   },
 };
 

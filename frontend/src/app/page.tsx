@@ -4,9 +4,9 @@ import { ConcertCard } from "@/components/ConcertCard/ConcertCard";
 
 const HomePage = async () => {
   const concerts = await getConcerts();
-
+  console.log(concerts);
   return (
-    <main>
+    <main className={styles.container}>
       <h1 className={styles.title}>LIVE, 지금 시작됩니다</h1>
       <div className={styles.grid}>
         {concerts.map((concert) => (

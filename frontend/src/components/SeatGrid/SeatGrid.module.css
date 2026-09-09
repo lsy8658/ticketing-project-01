@@ -1,0 +1,39 @@
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 20px;
+}
+
+.seat {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seat:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.selected {
+  border-color: var(--color-accent);
+  background-color: rgba(255, 46, 136, 0.15);
+}
+
+@media (max-width: 480px) {
+  .seat {
+    width: 32px;
+    height: 32px;
+  }
+  .grid {
+    gap: 6px;
+  }
+}

@@ -14,11 +14,11 @@
 .grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
+  gap: 28px;
 }
 
 .grid > * {
-  flex: 1 1 220px;
+  width: 240px;
 }
 
 @media (max-width: 480px) {
@@ -28,5 +28,12 @@
 
   .title {
     font-size: 24px;
+  }
+  .grid {
+    gap: 16px;
+  }
+
+  .grid > * {
+    width: calc(50% - 8px);
   }
 }

@@ -1,5 +1,7 @@
+import Image from "next/image";
 import { getConcert } from "@/lib/api/concerts";
 import { getConcertSchedules } from "@/lib/api/concertSchedules";
+import { ScheduleList } from "@/components/ScheduleList/ScheduleList";
 import styles from "./page.module.css";
 
 const ConcertDetailPage = async ({
@@ -17,19 +19,22 @@ const ConcertDetailPage = async ({
   }
 
   return (
-    <main className={styles.container}>
-      <h1 className={styles.title}>{concert.title}</h1>
-      <p className={styles.description}>{concert.description}</p>
+    <main>
+      <div className={styles.hero}>
+        <Image
+          src={concert.imageUrl}
+          alt={concert.title}
+          fill
+          className={styles.heroImage}
+        />
+        <div className={styles.heroOverlay} />
+        <h1 className={styles.heroTitle}>{concert.title}</h1>
+      </div>
 
-      <ul className={styles.scheduleList}>
-        {schedules.map((schedule) => (
-          <li key={schedule.id} className={styles.scheduleItem}>
-            {new Date(schedule.startAt).toLocaleString("ko-KR") +
-              "·" +
-              schedule.venue.name}
-          </li>
-        ))}
-      </ul>
+      <div className={styles.container}>
+        <p className={styles.description}>{concert.description}</p>
+        <ScheduleList schedules={schedules} />
+      </div>
     </main>
   );
 };
