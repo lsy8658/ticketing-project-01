@@ -2,6 +2,7 @@ package com.ticket.concert.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.ticket.concert.dto.ImageInfo;
 import com.ticket.concert.exception.CustomException;
 import com.ticket.concert.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -17,20 +19,25 @@ import java.util.Map;
 public class ImageUploadService {
     private final Cloudinary cloudinary;
 
-    public Map<String, String> upload(MultipartFile file) {
-        try {
-            Map<String, Object> result = cloudinary.uploader().upload(
-                    file.getBytes(),
-                    ObjectUtils.emptyMap()
-            );
+    public List<ImageInfo> uploadImages(List<MultipartFile> files) {
+        List<ImageInfo> result = new ArrayList<>();
 
-            Map<String, String> response = new HashMap<>();
-            response.put("url", (String) result.get("secure_url"));
-            response.put("publicId", (String) result.get("public_id"));
-            return response;
-        } catch (IOException e) {
-            throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
+        for (MultipartFile file : files) {
+            try {
+                Map<String, Object> uploaded = cloudinary.uploader().upload(
+                        file.getBytes(),
+                        ObjectUtils.emptyMap()
+                );
+                result.add(new ImageInfo(
+                        (String) uploaded.get("secure_url"),
+                        (String) uploaded.get("public_id")
+                ));
+            } catch (IOException e) {
+                throw new CustomException(ErrorCode.IMAGE_UPLOAD_FAILED);
+            }
         }
+
+        return result;
     }
 
     public void delete(String publicId) {
