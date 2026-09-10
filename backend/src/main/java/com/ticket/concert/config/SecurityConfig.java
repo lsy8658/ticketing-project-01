@@ -68,6 +68,7 @@ public class SecurityConfig {
                                         "/api/schedule-seat/**",
                                         "/api/images/**"
                                 ).hasAnyRole("MANAGER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/user/users").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.PATCH, "/api/user/**").hasRole("ADMIN")
                                 .requestMatchers(
                                         "/api/user/**",
