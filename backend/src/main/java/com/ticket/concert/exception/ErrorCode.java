@@ -27,7 +27,11 @@ public enum ErrorCode {
     ALREADY_PAID(HttpStatus.CONFLICT, "이미 결제된 예약입니다."),
     SEAT_NOT_HOLDING(HttpStatus.BAD_REQUEST, "결제할 수 없는 좌석이 있습니다."),
     IMAGE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 업로드에 실패했습니다."),
-    CONCERT_SCHEDULE_HAS_RESERVATION(HttpStatus.CONFLICT, "예약이 있는 회차는 삭제할 수 없습니다.");
+    CONCERT_SCHEDULE_HAS_RESERVATION(HttpStatus.CONFLICT, "예약이 있는 회차는 삭제할 수 없습니다."),
+    ROLE_REQUEST_ALREADY_PENDING(HttpStatus.CONFLICT, "이미 대기중인 권한 신청이 있습니다."),
+    ROLE_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "권한 신청을 찾을 수 없습니다."),
+    ROLE_REQUEST_ALREADY_PROCESSED(HttpStatus.CONFLICT, "이미 처리된 권한 신청입니다."),
+    ROLE_REQUEST_INVALID(HttpStatus.BAD_REQUEST, "유효하지 않은 권한 신청입니다.");
 
     private final HttpStatus status;
     private final String message;
