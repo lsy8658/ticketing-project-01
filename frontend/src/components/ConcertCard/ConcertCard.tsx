@@ -3,7 +3,6 @@ import { Concert } from "@/types/concert";
 import styles from "./Concert.module.css";
 
 export const ConcertCard = ({ concert }: { concert: Concert }) => {
-  console.log(concert.imageUrl);
   return (
     <div className={styles.card}>
       <div className={styles.imageWrapper}>

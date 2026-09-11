@@ -8,11 +8,13 @@ import styles from "./page.module.css";
 const PaymentSuccessPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { mutate, isPending, isError } =
-    useAxiosMutation<ConfirmPaymentRequest>({
-      url: "/payments/confirm",
-      type: "post",
-    });
+  const { mutate, isPending, isError } = useAxiosMutation<
+    void,
+    ConfirmPaymentRequest
+  >({
+    url: "/payments/confirm",
+    type: "post",
+  });
 
   useEffect(() => {
     const paymentKey = searchParams.get("paymentKey")!;
