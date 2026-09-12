@@ -33,6 +33,17 @@ public class RoleRequestController {
         return ResponseEntity.ok(roleRequestService.getPending());
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<RoleRequestResponse> getMyRequest(
+            Authentication authentication
+    ) {
+        Long userId = (Long) authentication.getPrincipal();
+        return roleRequestService.findLatestByUser(userId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
+
+
     @PatchMapping("/{id}/approve")
     public ResponseEntity<Void> approve(@PathVariable("id") Long id) {
         roleRequestService.approve(id);
