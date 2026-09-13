@@ -8,6 +8,8 @@ import { SeatCreateRequest, SeatResponse } from "@/types/seat";
 import { isAxiosError } from "axios";
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import styles from "./page.module.css";
+import { useAxiosQuery } from "@/lib/useAxiosQuery";
+import { VenueResponse } from "@/types/venue";
 
 const AdminSeatsPage = () => {
   const [form, setForm] = useState({
@@ -16,6 +18,11 @@ const AdminSeatsPage = () => {
     seatNumber: "",
   });
   const [error, setError] = useState("");
+
+  const { data: venues = [] } = useAxiosQuery<VenueResponse[]>({
+    url: "/venuse",
+    queryKey: ["venues"],
+  });
 
   const { mutate, isPending, isSuccess } = useAxiosMutation<
     SeatResponse,

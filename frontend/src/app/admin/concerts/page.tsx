@@ -16,7 +16,7 @@ const AdminConcertsPage = () => {
     description: "",
   });
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
-  const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
+  const [mainImagePreview, setMainImagePreview] = useState<string>("");
   const [subImageFiles, setSubImageFiles] = useState<File[]>([]);
   const [subImagePreviews, setSubImagePreviews] = useState<string[]>([]);
   const [error, setError] = useState("");
@@ -47,10 +47,10 @@ const AdminConcertsPage = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const previewUrl = URL.createObjectURL(file);
+    if (mainImagePreview) URL.revokeObjectURL(mainImagePreview);
 
     setMainImageFile(file);
-    setMainImagePreview(previewUrl);
+    setMainImagePreview(URL.createObjectURL(file));
   };
 
   const handleSubImagesChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -65,12 +65,8 @@ const AdminConcertsPage = () => {
   };
 
   const handleRemoveMainImage = () => {
-    if (mainImagePreview) {
-      URL.revokeObjectURL(mainImagePreview);
-    }
-
     setMainImageFile(null);
-    setMainImagePreview(null);
+    setMainImagePreview("");
   };
 
   const handleRemoveSubImage = (index: number) => {
@@ -151,7 +147,7 @@ const AdminConcertsPage = () => {
 
         <label>대표 이미지</label>
         <input type="file" accept="image/*" onChange={handleMainImageChange} />
-        {mainImagePreview && (
+        {mainImageFile ? (
           <>
             <img
               src={mainImagePreview}
@@ -162,6 +158,8 @@ const AdminConcertsPage = () => {
               삭제
             </button>
           </>
+        ) : (
+          <></>
         )}
 
         <label>서브 이미지 ( 여러 장 선택 가능 )</label>
