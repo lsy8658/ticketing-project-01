@@ -20,7 +20,6 @@ public class ConcertScheduleService {
     private final ConcertScheduleRepository concertScheduleRepository;
     private final ConcertRepository concertRepository;
     private final VenueRepository venueRepository;
-    private final SeatRepository seatRepository;
     private final ScheduleSeatRepository scheduleSeatRepository;
     private final ReservationRepository reservationRepository;
 
@@ -39,13 +38,6 @@ public class ConcertScheduleService {
         ConcertSchedule schedule = new ConcertSchedule(concert, venue, startAt);
 
         ConcertSchedule savedSchedule = concertScheduleRepository.save(schedule);
-
-        List<Seat> seats = seatRepository.findAllByVenue(venue);
-
-        List<ScheduleSeat> scheduleSeats = seats.stream()
-                .map(seat -> new ScheduleSeat(savedSchedule, seat)).toList();
-
-        scheduleSeatRepository.saveAll(scheduleSeats);
 
         return ConcertScheduleResponse.from(savedSchedule);
     }

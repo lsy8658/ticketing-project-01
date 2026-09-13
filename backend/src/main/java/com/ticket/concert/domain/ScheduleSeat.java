@@ -24,15 +24,20 @@ public class ScheduleSeat {
     @JoinColumn(name = "seat_id", nullable = false)
     private Seat seat;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seat_grade_id", nullable = false)
+    private SeatGrade seatGrade;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SeatStatus status;
 
     private LocalDateTime holdAt;
 
-    public ScheduleSeat(ConcertSchedule concertSchedule, Seat seat) {
+    public ScheduleSeat(ConcertSchedule concertSchedule, Seat seat, SeatGrade seatGrade) {
         this.concertSchedule = concertSchedule;
         this.seat = seat;
+        this.seatGrade = seatGrade;
         this.status = SeatStatus.AVAILABLE;
     }
 
@@ -49,5 +54,4 @@ public class ScheduleSeat {
         this.status = SeatStatus.AVAILABLE;
         this.holdAt = null;
     }
-
 }

@@ -26,8 +26,8 @@ public class ScheduleSeatResponse {
                 scheduleSeat.getId(),
                 scheduleSeat.getSeat().getSeatNumber(),
                 scheduleSeat.getStatus(),
-                scheduleSeat.getSeat().getSeatGrade().getName(),
-                scheduleSeat.getSeat().getSeatGrade().getPrice()
+                scheduleSeat.getSeatGrade().getName(),
+                scheduleSeat.getSeatGrade().getPrice()
         );
     }
 }

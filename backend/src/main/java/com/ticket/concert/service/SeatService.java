@@ -1,52 +1,68 @@
 package com.ticket.concert.service;
 
 import com.ticket.concert.domain.Seat;
-import com.ticket.concert.domain.SeatGrade;
 import com.ticket.concert.domain.Venue;
+import com.ticket.concert.dto.SeatBulkCreateRequest;
 import com.ticket.concert.dto.SeatResponse;
 import com.ticket.concert.exception.CustomException;
 import com.ticket.concert.exception.ErrorCode;
-import com.ticket.concert.repository.SeatGradeRepository;
 import com.ticket.concert.repository.SeatRepository;
 import com.ticket.concert.repository.VenueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class SeatService {
 
     private final SeatRepository seatRepository;
-    private final SeatGradeRepository seatGradeRepository;
     private final VenueRepository venueRepository;
 
     public SeatResponse create(
             Long venueId,
-            Long seatGradeId,
             String seatNumber
     ) {
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
 
-        SeatGrade seatGrade = seatGradeRepository.findById(seatGradeId)
-                .orElseThrow(() -> new CustomException(ErrorCode.SEAT_GRADE_NOT_FOUND));
-
-        Seat seat = new Seat(
-                venue,
-                seatGrade,
-                seatNumber
-        );
         Boolean exists = seatRepository.existsByVenueAndSeatNumber(venue, seatNumber);
 
         if (exists) {
             throw new CustomException(ErrorCode.SEAT_ALREADY_EXISTS);
         }
+
+        Seat seat = new Seat(venue, seatNumber);
         Seat savedSeat = seatRepository.save(seat);
 
         return new SeatResponse(
                 savedSeat.getId(),
-                savedSeat.getSeatNumber(),
-                savedSeat.getSeatGrade().getId()
+                savedSeat.getSeatNumber()
         );
+    }
+
+    public List<SeatResponse> createBulk(Long venueId, List<SeatBulkCreateRequest.RowRequest> rows) {
+        Venue venue = venueRepository.findById(venueId)
+                .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
+
+        List<Seat> seats = new ArrayList<>();
+
+        for (SeatBulkCreateRequest.RowRequest row : rows) {
+            for (int i = 1; i <= row.getSeatCount(); i++) {
+                String seatNumber = row.getRowName() +"-"+ i;
+                if (seatRepository.existsByVenueAndSeatNumber(venue, seatNumber)) {
+                    throw new CustomException(ErrorCode.SEAT_ALREADY_EXISTS);
+                }
+                seats.add(new Seat(venue, seatNumber));
+            }
+        }
+
+        List<Seat> savedSeats = seatRepository.saveAll(seats);
+
+        return savedSeats.stream()
+                .map(seat -> new SeatResponse(seat.getId(), seat.getSeatNumber()))
+                .toList();
     }
 }

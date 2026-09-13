@@ -1,5 +1,6 @@
 package com.ticket.concert.repository;
 
+import com.ticket.concert.domain.Concert;
 import com.ticket.concert.domain.ConcertSchedule;
 import com.ticket.concert.domain.Venue;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,4 +11,5 @@ import java.util.List;
 public interface ConcertScheduleRepository extends JpaRepository<ConcertSchedule, Long> {
     boolean existsByVenueAndStartAt(Venue venue, LocalDateTime startAt);
     List<ConcertSchedule> findAllByConcertId(Long concertId);
+    boolean existsByConcert(Concert concert);
 }

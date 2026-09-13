@@ -1,6 +1,5 @@
 package com.ticket.concert.domain;
 
-
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,16 +20,11 @@ public class Seat {
     @JoinColumn(name = "venue_id", nullable = false)
     private Venue venue;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seat_grade_id", nullable = false)
-    private SeatGrade seatGrade;
-
     @Column(nullable = false)
     private String seatNumber;
 
-    public Seat(Venue venue, SeatGrade seatGrade, String seatNumber) {
+    public Seat(Venue venue, String seatNumber) {
         this.venue = venue;
-        this.seatGrade = seatGrade;
         this.seatNumber = seatNumber;
     }
 }

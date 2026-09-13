@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,8 +20,14 @@ public class ConcertController {
     private final ConcertService concertService;
 
     @PostMapping
-    public ResponseEntity<Long> createConcert(@Valid @RequestBody ConcertCreateRequest request) {
-        Long id = concertService.create(request.getTitle(), request.getDescription(), request.getImageUrl(), request.getImages());
+    public ResponseEntity<Long> createConcert(
+            Authentication authentication,
+            @Valid @RequestBody ConcertCreateRequest request
+    ) {
+        Long userId = (Long) authentication.getPrincipal();
+        Long id = concertService.create(
+                userId, request.getTitle(), request.getDescription(), request.getImageUrl(), request.getImages()
+        );
         return ResponseEntity.status(HttpStatus.CREATED).body(id);
     }
 
@@ -37,14 +44,23 @@ public class ConcertController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ConcertResponse> updateConcert (@PathVariable("id") Long id, @RequestBody ConcertUpdateRequest request) {
-        ConcertResponse concert =  concertService.update(id, request);
+    public ResponseEntity<ConcertResponse> updateConcert (
+            Authentication authentication,
+            @PathVariable("id") Long id,
+            @RequestBody ConcertUpdateRequest request
+    ) {
+        Long userId = (Long) authentication.getPrincipal();
+        ConcertResponse concert =  concertService.update(id, userId, request);
         return ResponseEntity.ok(concert);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteConcert (@PathVariable("id") Long id) {
-        concertService.delete(id);
+    public ResponseEntity<Void> deleteConcert (
+            Authentication authentication,
+            @PathVariable("id") Long id
+    ) {
+        Long userId = (Long) authentication.getPrincipal();
+        concertService.delete(id, userId);
         return ResponseEntity.noContent().build();
     }
 }

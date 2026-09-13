@@ -1,9 +1,6 @@
 package com.ticket.concert.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,11 +14,15 @@ public class Venue {
     private Long id;
 
     private String name;
-
     private String address;
 
-    public Venue(String name, String address) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "create_by", nullable = false)
+    private User createBy;
+
+    public Venue(String name, String address, User createBy) {
         this.name = name;
         this.address = address;
+        this.createBy = createBy;
     }
 }

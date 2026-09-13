@@ -69,7 +69,7 @@ public class PaymentService {
         }
         long actualAmount = reservationSeats.stream()
                 .mapToLong(reservationSeat -> reservationSeat.getScheduleSeat()
-                        .getSeat().getSeatGrade().getPrice()).sum();
+                        .getSeatGrade().getPrice()).sum();
 
         if (request.getAmount() != actualAmount) {
             throw new CustomException(ErrorCode.INVALID_PAYMENT_AMOUNT);

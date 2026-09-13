@@ -1,8 +1,9 @@
 package com.ticket.concert.Controller;
 
-import com.ticket.concert.domain.ConcertSchedule;
+import com.ticket.concert.dto.ScheduleSeatCreateRequest;
 import com.ticket.concert.dto.ScheduleSeatResponse;
 import com.ticket.concert.service.ScheduleSeatService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +26,11 @@ public class ScheduleSeatController {
     }
 
     @PostMapping("/{concertScheduleId}")
-    public ResponseEntity<Void> create(@PathVariable("concertScheduleId") Long concertScheduleId) {
-        scheduleSeatService.create(concertScheduleId);
+    public ResponseEntity<Void> create(
+            @PathVariable("concertScheduleId") Long concertScheduleId,
+            @Valid @RequestBody ScheduleSeatCreateRequest request
+    ) {
+        scheduleSeatService.create(concertScheduleId, request.getSeatGradeId(), request.getSeatIds());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

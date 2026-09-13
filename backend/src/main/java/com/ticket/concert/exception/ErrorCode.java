@@ -31,7 +31,8 @@ public enum ErrorCode {
     ROLE_REQUEST_ALREADY_PENDING(HttpStatus.CONFLICT, "이미 대기중인 권한 신청이 있습니다."),
     ROLE_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "권한 신청을 찾을 수 없습니다."),
     ROLE_REQUEST_ALREADY_PROCESSED(HttpStatus.CONFLICT, "이미 처리된 권한 신청입니다."),
-    ROLE_REQUEST_INVALID(HttpStatus.BAD_REQUEST, "유효하지 않은 권한 신청입니다.");
+    ROLE_REQUEST_INVALID(HttpStatus.BAD_REQUEST, "유효하지 않은 권한 신청입니다."),
+    CONCERT_HAS_SCHEDULE(HttpStatus.CONFLICT, "공연 일정이 있는 콘서트는 삭제할 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;

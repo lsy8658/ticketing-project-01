@@ -17,16 +17,20 @@ public class Concert {
 
     @Column(nullable = false)
     private String title;
-
     private String description;
 
     private String imageUrl;
 
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="create_by", nullable = false)
+    private User createBy;
+
     @Builder
-    public Concert (String title, String description, String imageUrl) {
+    public Concert (String title, String description, String imageUrl, User createBy) {
         this.title = title;
         this.description = description;
         this.imageUrl = imageUrl;
+        this.createBy = createBy;
     }
 
     public void update(String title, String description, String imageUrl) {

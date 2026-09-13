@@ -7,9 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ScheduleSeatRepository  extends JpaRepository<ScheduleSeat, Long> {
+public interface ScheduleSeatRepository extends JpaRepository<ScheduleSeat, Long> {
     List<ScheduleSeat> findAllByStatus(SeatStatus status);
     boolean existsByConcertSchedule(ConcertSchedule concertSchedule);
     void deleteAllByConcertSchedule(ConcertSchedule concertSchedule);
     List<ScheduleSeat> findAllByConcertScheduleId(Long concertScheduleId);
+    boolean existsByConcertScheduleAndSeatIdIn(ConcertSchedule concertSchedule, List<Long> seatIds);
 }
