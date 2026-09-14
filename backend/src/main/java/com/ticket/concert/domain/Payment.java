@@ -25,10 +25,13 @@ public class Payment {
     @Column(nullable = false)
     private Long amount;
 
-    public Payment(Reservation reservation, Long amount) {
+    private String paymentKey;
+
+    public Payment(Reservation reservation, Long amount, String paymentKey) {
         this.reservation = reservation;
         this.amount = amount;
         this.status = PaymentStatus.PENDING;
+        this.paymentKey = paymentKey;
     }
 
     public void complete() {
@@ -37,5 +40,9 @@ public class Payment {
 
     public void fail() {
         this.status = PaymentStatus.FAILED;
+    }
+
+    public void refund () {
+        this.status = PaymentStatus.REFUNDED;
     }
 }

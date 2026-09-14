@@ -23,8 +23,16 @@ public class Seat {
     @Column(nullable = false)
     private String seatNumber;
 
-    public Seat(Venue venue, String seatNumber) {
+    @Column(nullable = false)
+    private int priority;
+
+    @Column(nullable = false)
+    private String rowName;
+
+    public Seat(Venue venue, String seatNumber, String rowName, int priority) {
         this.venue = venue;
         this.seatNumber = seatNumber;
+        this.rowName = rowName;
+        this.priority = priority;
     }
 }

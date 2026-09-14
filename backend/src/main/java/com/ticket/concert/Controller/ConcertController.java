@@ -26,7 +26,8 @@ public class ConcertController {
     ) {
         Long userId = (Long) authentication.getPrincipal();
         Long id = concertService.create(
-                userId, request.getTitle(), request.getDescription(), request.getImageUrl(), request.getImages()
+                userId, request.getTitle(), request.getDescription(), request.getImageUrl(),
+                request.getSalesStartAt(), request.getSalesEndAt(), request.getImages()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(id);
     }
@@ -43,6 +44,15 @@ public class ConcertController {
         return ResponseEntity.ok(concerts);
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<List<ConcertResponse>> getMyConcerts(
+            Authentication authentication
+    ) {
+        Long userId = (Long) authentication.getPrincipal();
+        List<ConcertResponse> concerts = concertService.findMyConcerts(userId);
+        return ResponseEntity.ok(concerts);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ConcertResponse> updateConcert (
             Authentication authentication,
@@ -50,7 +60,7 @@ public class ConcertController {
             @RequestBody ConcertUpdateRequest request
     ) {
         Long userId = (Long) authentication.getPrincipal();
-        ConcertResponse concert =  concertService.update(id, userId, request);
+        ConcertResponse concert =  concertService.update(userId, id, request);
         return ResponseEntity.ok(concert);
     }
 
@@ -60,7 +70,7 @@ public class ConcertController {
             @PathVariable("id") Long id
     ) {
         Long userId = (Long) authentication.getPrincipal();
-        concertService.delete(id, userId);
+        concertService.delete(userId, id);
         return ResponseEntity.noContent().build();
     }
 }

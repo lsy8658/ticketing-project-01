@@ -27,5 +27,8 @@ public class SeatBulkCreateRequest {
         @NotNull(message = "좌석 수는 필수입니다.")
         @Positive(message = "좌석 수는 1 이상이어야 합니다.")
         private Integer seatCount;
+
+        @NotNull(message = "우선순위는 필수입니다.")
+        private Integer priority;
     }
 }

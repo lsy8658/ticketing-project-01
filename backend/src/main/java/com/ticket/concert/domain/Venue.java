@@ -25,4 +25,9 @@ public class Venue {
         this.address = address;
         this.createBy = createBy;
     }
+
+    public void update(String name, String address) {
+        this.name = name;
+        this.address = address;
+    }
 }

@@ -66,7 +66,8 @@ public class SecurityConfig {
                                         "/api/seat-grades/**",
                                         "/api/seats/**",
                                         "/api/schedule-seat/**",
-                                        "/api/images/**"
+                                        "/api/images/**",
+                                        "/api/concert-seat-grades/**"
                                 ).hasAnyRole("MANAGER", "ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/api/user/users").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.PATCH, "/api/user/**").hasRole("ADMIN")

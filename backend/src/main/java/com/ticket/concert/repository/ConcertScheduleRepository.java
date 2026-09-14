@@ -7,9 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface ConcertScheduleRepository extends JpaRepository<ConcertSchedule, Long> {
     boolean existsByVenueAndStartAt(Venue venue, LocalDateTime startAt);
     List<ConcertSchedule> findAllByConcertId(Long concertId);
     boolean existsByConcert(Concert concert);
+    Optional<ConcertSchedule> findFirstByConcertId(Long concertId);
 }

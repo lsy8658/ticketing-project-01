@@ -23,7 +23,9 @@ public class SeatService {
 
     public SeatResponse create(
             Long venueId,
-            String seatNumber
+            String seatNumber,
+            String rowName,
+            int priority
     ) {
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
@@ -34,12 +36,14 @@ public class SeatService {
             throw new CustomException(ErrorCode.SEAT_ALREADY_EXISTS);
         }
 
-        Seat seat = new Seat(venue, seatNumber);
+        Seat seat = new Seat(venue, seatNumber, rowName, priority);
         Seat savedSeat = seatRepository.save(seat);
 
         return new SeatResponse(
                 savedSeat.getId(),
-                savedSeat.getSeatNumber()
+                savedSeat.getSeatNumber(),
+                savedSeat.getRowName(),
+                savedSeat.getPriority()
         );
     }
 
@@ -55,14 +59,19 @@ public class SeatService {
                 if (seatRepository.existsByVenueAndSeatNumber(venue, seatNumber)) {
                     throw new CustomException(ErrorCode.SEAT_ALREADY_EXISTS);
                 }
-                seats.add(new Seat(venue, seatNumber));
+                seats.add(new Seat(venue, seatNumber, row.getRowName(), row.getPriority()));
             }
         }
 
         List<Seat> savedSeats = seatRepository.saveAll(seats);
 
         return savedSeats.stream()
-                .map(seat -> new SeatResponse(seat.getId(), seat.getSeatNumber()))
-                .toList();
+                .map(seat ->
+                        new SeatResponse(
+                                seat.getId(),
+                                seat.getSeatNumber(),
+                                seat.getRowName(),
+                                seat.getPriority())
+                ).toList();
     }
 }

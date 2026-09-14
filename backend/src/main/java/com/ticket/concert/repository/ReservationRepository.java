@@ -1,5 +1,6 @@
 package com.ticket.concert.repository;
 
+import com.ticket.concert.domain.Concert;
 import com.ticket.concert.domain.ConcertSchedule;
 import com.ticket.concert.domain.Reservation;
 import com.ticket.concert.domain.User;
@@ -10,4 +11,5 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     List<Reservation> findAllByUser(User user);
     boolean existsByConcertSchedule(ConcertSchedule concertSchedule);
+    List<Reservation> findAllByConcertSchedule_Concert(Concert concert);
 }

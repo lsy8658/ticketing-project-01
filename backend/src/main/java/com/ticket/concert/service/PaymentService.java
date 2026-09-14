@@ -97,7 +97,7 @@ public class PaymentService {
                 .toBodilessEntity();
 
 
-        Payment payment = new Payment(reservation, request.getAmount());
+        Payment payment = new Payment(reservation, request.getAmount(), request.getPaymentKey());
         payment.complete();
         paymentRepository.save(payment);
 
@@ -113,5 +113,21 @@ public class PaymentService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return paymentRepository.findAllByReservation_User(user);
+    }
+
+    public void cancel(Payment payment, String reason) {
+        String encodedKey = Base64.getEncoder()
+                .encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+
+        restClient.post()
+                .uri("https://api.tosspayments.com/v1/payments/{paymentKey}/cancel", payment.getPaymentKey())
+                .header(HttpHeaders.AUTHORIZATION, "Basic " + encodedKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of("cancelReason", reason))
+                .retrieve()
+                .toBodilessEntity();
+
+        payment.refund();
+
     }
 }
