@@ -113,8 +113,8 @@ public class ReservationService {
         List<ReservationDetailResponse.SeatInfo> seatInfos = reservationSeats.stream()
                 .map(rs -> new ReservationDetailResponse.SeatInfo(
                         rs.getScheduleSeat().getSeat().getSeatNumber(),
-                        rs.getScheduleSeat().getSeat().getSeatGrade().getName(),
-                        rs.getScheduleSeat().getSeat().getSeatGrade().getPrice()
+                        rs.getScheduleSeat().getSeatGrade().getName(),
+                        rs.getScheduleSeat().getSeatGrade().getPrice()
                 ))
                 .toList();
 
