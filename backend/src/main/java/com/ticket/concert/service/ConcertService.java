@@ -74,11 +74,8 @@ public class ConcertService {
                 .map(concert -> {
                     List<ImageInfo> images = getImages(concert);
                     return new ConcertResponse(
-                            concert.getId(),
-                            concert.getTitle(),
-                            concert.getDescription(),
-                            concert.getImageUrl(),
-                            images
+                            concert.getId(), concert.getTitle(), concert.getDescription(), concert.getImageUrl(),
+                            concert.getStatus(), concert.getSalesStartAt(), concert.getSalesEndAt(), images
                     );
                 }).toList();
     }
@@ -87,12 +84,15 @@ public class ConcertService {
         Concert concert = concertRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_NOT_FOUND));
         return new ConcertResponse(concert.getId(), concert.getTitle(),
-                concert.getDescription(), concert.getImageUrl(), getImages(concert));
+                concert.getDescription(), concert.getImageUrl(),
+                concert.getStatus(), concert.getSalesStartAt(), concert.getSalesEndAt(),
+                getImages(concert));
     }
 
     public List<ConcertResponse> findAll() {
         return concertRepository.findAll().stream()
-                .map(c -> new ConcertResponse(c.getId(), c.getTitle(), c.getDescription(), c.getImageUrl(), getImages(c)))
+                .map(c -> new ConcertResponse(c.getId(), c.getTitle(), c.getDescription(), c.getImageUrl(),
+                        c.getStatus(), c.getSalesStartAt(), c.getSalesEndAt(), getImages(c)))
                 .toList();
     }
 
@@ -100,7 +100,8 @@ public class ConcertService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         return concertRepository.findAllByCreateBy(user).stream()
-                .map(c -> new ConcertResponse(c.getId(), c.getTitle(), c.getDescription(), c.getImageUrl(), getImages(c)))
+                .map(c -> new ConcertResponse(c.getId(), c.getTitle(), c.getDescription(), c.getImageUrl(),
+                        c.getStatus(), c.getSalesStartAt(), c.getSalesEndAt(), getImages(c)))
                 .toList();
     }
 
@@ -129,7 +130,8 @@ public class ConcertService {
                 concertImageRepository.save(new ConcertImage(concert, info.getUrl(), info.getPublicId(), i));
             }
         }
-        return new ConcertResponse(id, request.getTitle(), request.getDescription(), request.getImageUrl(), newImages);
+        return new ConcertResponse(id, request.getTitle(), request.getDescription(), request.getImageUrl(),
+                concert.getStatus(), concert.getSalesStartAt(), concert.getSalesEndAt(), newImages);
     }
 
     @Transactional
