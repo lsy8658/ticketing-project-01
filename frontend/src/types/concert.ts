@@ -3,6 +3,9 @@ export type Concert = {
   title: string;
   description: string;
   imageUrl: string;
+  status: "ACTIVE" | "SUSPENDED";
+  salesStartAt: string;
+  salesEndAt: string;
   images: { url: string; publicId: string }[];
 };
 

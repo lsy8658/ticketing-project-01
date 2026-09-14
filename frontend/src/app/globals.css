@@ -38,3 +38,45 @@ button {
 li {
   list-style: none;
 }
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-text-muted);
+}
+
+.fileInput {
+  color: transparent;
+  font-size: 14px;
+  width: 81px;
+}
+
+.fileInput::file-selector-button {
+  padding: 8px 14px;
+  margin-right: 12px;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.fileInput::file-selector-button:hover {
+  background-color: var(--color-bg);
+}
+
+.fileInput::-webkit-file-upload-text {
+  display: none;
+}
