@@ -60,7 +60,7 @@ public class ConcertController {
             @RequestBody ConcertUpdateRequest request
     ) {
         Long userId = (Long) authentication.getPrincipal();
-        ConcertResponse concert =  concertService.update(userId, id, request);
+        ConcertResponse concert = concertService.update(id, userId, request);
         return ResponseEntity.ok(concert);
     }
 
