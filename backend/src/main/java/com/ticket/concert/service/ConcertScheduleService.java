@@ -24,19 +24,30 @@ public class ConcertScheduleService {
     private final ReservationRepository reservationRepository;
 
     @Transactional
-    public ConcertScheduleResponse create(Long concertId, Long venueId, LocalDateTime startAt) {
+    public ConcertScheduleResponse create(Long userId, Long concertId, Long venueId, LocalDateTime startAt, LocalDateTime endAt) {
         Concert concert = concertRepository.findById(concertId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_NOT_FOUND));
+
+        if (!concert.getCreateBy().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
 
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
 
-        if (concertScheduleRepository.existsByVenueAndStartAt(venue, startAt)) {
+        if (!venue.getCreateBy().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
+        if (!startAt.isBefore(endAt)) {
+            throw new CustomException(ErrorCode.CONCERT_SCHEDULE_PERIOD_INVALID);
+        }
+
+        if (concertScheduleRepository.existsOverlappingSchedule(venue, startAt.toLocalDate(), endAt.toLocalDate())) {
             throw new CustomException(ErrorCode.CONCERT_SCHEDULE_ALREADY_EXISTS);
         }
 
-        ConcertSchedule schedule = new ConcertSchedule(concert, venue, startAt);
-
+        ConcertSchedule schedule = new ConcertSchedule(concert, venue, startAt, endAt);
         ConcertSchedule savedSchedule = concertScheduleRepository.save(schedule);
 
         return ConcertScheduleResponse.from(savedSchedule);
@@ -47,19 +58,44 @@ public class ConcertScheduleService {
     }
 
     @Transactional
-    public ConcertScheduleResponse update(Long scheduleId, ConcertScheduleUpdateRequest request) {
+    public ConcertScheduleResponse update(Long scheduleId, Long userId,ConcertScheduleUpdateRequest request) {
         ConcertSchedule schedule = concertScheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_SCHEDULE_NOT_FOUND));
 
+        if (!schedule.getConcert().getCreateBy().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
+        LocalDateTime startAt = request.getStartAt();
+        LocalDateTime endAt = request.getEndAt();
+
+        if (!startAt.isBefore(endAt)) {
+            throw new CustomException(ErrorCode.CONCERT_SCHEDULE_PERIOD_INVALID);
+        }
+
+        if (reservationRepository.existsByConcertSchedule(schedule)) {
+            throw new CustomException(ErrorCode.CONCERT_SCHEDULE_HAS_RESERVATION);
+        }
+
+        if (concertScheduleRepository.existsOverlappingScheduleExcludingSelf(
+                schedule.getVenue(), scheduleId, startAt.toLocalDate(), endAt.toLocalDate())) {
+            throw new CustomException(ErrorCode.CONCERT_SCHEDULE_ALREADY_EXISTS);
+        }
+
         schedule.updateStartAt(request.getStartAt());
+        schedule.updateEndAt(request.getEndAt());
 
         return ConcertScheduleResponse.from(schedule);
     }
 
     @Transactional
-    public void delete(Long scheduleId) {
+    public void delete(Long scheduleId, Long userId) {
         ConcertSchedule schedule = concertScheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_SCHEDULE_NOT_FOUND));
+
+        if (!schedule.getConcert().getCreateBy().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
 
         if (reservationRepository.existsByConcertSchedule(schedule)) {
             throw new CustomException(ErrorCode.CONCERT_SCHEDULE_HAS_RESERVATION);

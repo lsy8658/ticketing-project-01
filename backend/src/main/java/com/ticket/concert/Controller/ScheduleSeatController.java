@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,10 +28,13 @@ public class ScheduleSeatController {
 
     @PostMapping("/{concertScheduleId}")
     public ResponseEntity<Void> create(
+            Authentication authentication,
             @PathVariable("concertScheduleId") Long concertScheduleId,
             @Valid @RequestBody ScheduleSeatCreateRequest request
     ) {
-        scheduleSeatService.create(concertScheduleId, request.getSeatGradeId(), request.getSeatIds());
+        Long userId = (Long) authentication.getPrincipal();
+
+        scheduleSeatService.create(userId, concertScheduleId, request.getSeatGradeId(), request.getSeatIds());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

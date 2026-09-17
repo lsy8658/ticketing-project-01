@@ -2,6 +2,7 @@ package com.ticket.concert.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+
 import java.time.LocalDateTime;
 
 @Getter
@@ -12,6 +13,9 @@ public class ConcertScheduleCreateRequest {
     @NotNull(message = "공연장 ID는 필수입니다.")
     private Long venueId;
 
-    @NotNull(message = "공연 일시는 필수입니다.")
+    @NotNull(message = "공연 시작일시는 필수입니다.")
     private LocalDateTime startAt;
+
+    @NotNull(message = "공연 종료일시는 필수입니다.")
+    private LocalDateTime endAt;
 }

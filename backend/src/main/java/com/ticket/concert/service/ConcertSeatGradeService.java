@@ -25,12 +25,15 @@ public class ConcertSeatGradeService {
                 .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_NOT_FOUND));
 
         if (!concert.getCreateBy().getId().equals(userId)) {
-            throw new CustomException(ErrorCode.SEAT_GRADE_NOT_FOUND);
+            throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
         SeatGrade seatGrade = seatGradeRepository.findById(seatGradeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.SEAT_GRADE_NOT_FOUND));
 
+        if (!seatGrade.getConcert().getId().equals(concertId)) {
+            throw new CustomException(ErrorCode.SEAT_GRADE_NOT_FOUND);
+        }
 
         Optional<ConcertSeatGrade> existing = concertSeatGradeRepository.findByConcertAndRowName(concert, rowName);
 

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,13 +24,14 @@ public class Payment {
     @Column(nullable = false)
     private Long amount;
 
+    @Column(nullable = false, unique = true)
     private String paymentKey;
 
     public Payment(Reservation reservation, Long amount, String paymentKey) {
         this.reservation = reservation;
         this.amount = amount;
-        this.status = PaymentStatus.PENDING;
         this.paymentKey = paymentKey;
+        this.status = PaymentStatus.PENDING;
     }
 
     public void complete() {
@@ -42,7 +42,7 @@ public class Payment {
         this.status = PaymentStatus.FAILED;
     }
 
-    public void refund () {
+    public void refund() {
         this.status = PaymentStatus.REFUNDED;
     }
 }

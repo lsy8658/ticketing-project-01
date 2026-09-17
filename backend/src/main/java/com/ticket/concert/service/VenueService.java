@@ -10,6 +10,7 @@ import com.ticket.concert.repository.UserRepository;
 import com.ticket.concert.repository.VenueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,6 +23,11 @@ public class VenueService {
     public Long create (Long userId, String name, String address) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (venueRepository.existsByNameAndAddress(name, address)) {
+            throw new CustomException(ErrorCode.VENUE_ALREADY_EXISTS);
+        }
+
         Venue venue = new Venue(name, address, user);
         return venueRepository.save(venue).getId();
     }
@@ -49,12 +55,14 @@ public class VenueService {
         return venue;
     }
 
+    @Transactional
     public VenueResponse update(Long venueId, Long userId, VenueUpdateRequest request) {
         Venue venue = findOwned(venueId, userId);
         venue.update(request.getName(), request.getAddress());
         return VenueResponse.from(venue);
     }
 
+    @Transactional
     public void delete(Long venueId, Long userId) {
         Venue venue = findOwned(venueId, userId);
         venueRepository.delete(venue);

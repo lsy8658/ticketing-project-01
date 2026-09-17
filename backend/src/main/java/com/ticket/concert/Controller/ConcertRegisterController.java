@@ -1,9 +1,7 @@
 package com.ticket.concert.Controller;
 
-import com.ticket.concert.dto.SeatBulkCreateRequest;
-import com.ticket.concert.dto.SeatCreateRequest;
-import com.ticket.concert.dto.SeatResponse;
-import com.ticket.concert.service.SeatService;
+import com.ticket.concert.dto.ConcertRegisterRequest;
+import com.ticket.concert.service.ConcertRegisterService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,21 +12,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/seats")
-public class SeatController {
-    private final SeatService seatService;
+@RequestMapping("/api/concerts/register")
+public class ConcertRegisterController {
+    private final ConcertRegisterService concertRegisterService;
 
     @PostMapping
-    public ResponseEntity<List<SeatResponse>> create(
+    public ResponseEntity<Long> register(
             Authentication authentication,
-            @Valid @RequestBody SeatBulkCreateRequest request) {
+            @Valid @RequestBody ConcertRegisterRequest request
+    ) {
         Long userId = (Long) authentication.getPrincipal();
-
-        List<SeatResponse> seats = seatService.createBulk(userId, request.getVenueId(), request.getRows());
-        return ResponseEntity.status(HttpStatus.CREATED).body(seats);
+        Long concertId = concertRegisterService.register(userId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(concertId);
     }
 }

@@ -8,4 +8,8 @@ import java.util.List;
 
 public interface VenueRepository extends JpaRepository<Venue, Long> {
     List<Venue> findAllByCreateBy(User user);
+    boolean existsByNameAndAddress(
+            String name,
+            String address
+    );
 }

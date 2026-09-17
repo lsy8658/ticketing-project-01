@@ -115,6 +115,13 @@ public class PaymentService {
         return paymentRepository.findAllByReservation_User(user);
     }
 
+    public void cancelByReservation(Reservation reservation, String reason) {
+        Payment payment = paymentRepository.findByReservation(reservation)
+                .orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
+
+        cancel(payment, reason);
+    }
+
     public void cancel(Payment payment, String reason) {
         String encodedKey = Base64.getEncoder()
                 .encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));

@@ -26,13 +26,21 @@ public class ConcertSchedule {
     @Column(nullable = false)
     private LocalDateTime startAt;
 
-    public ConcertSchedule(Concert concert, Venue venue, LocalDateTime startAt) {
+    @Column(nullable = false)
+    private LocalDateTime endAt;
+
+    public ConcertSchedule(Concert concert, Venue venue, LocalDateTime startAt, LocalDateTime endAt) {
         this.concert = concert;
         this.venue = venue;
         this.startAt = startAt;
+        this.endAt = endAt;
     }
 
     public void updateStartAt(LocalDateTime startAt) {
         this.startAt = startAt;
+    }
+
+    public void updateEndAt(LocalDateTime endAt) {
+        this.endAt = endAt;
     }
 }

@@ -18,9 +18,13 @@ public class SeatGradeService {
     private final SeatGradeRepository seatGradeRepository;
     private final ConcertRepository concertRepository;
 
-    public SeatGradeResponse create(Long concertId, String name, Long price) {
+    public SeatGradeResponse create(Long concertId, Long userId, String name, Long price) {
         Concert concert = concertRepository.findById(concertId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_NOT_FOUND));
+
+            if (!concert.getCreateBy().getId().equals(userId)) {
+                throw new CustomException(ErrorCode.FORBIDDEN);
+            }
 
             SeatGrade seatGrade = new SeatGrade(concert, name, price);
 
@@ -31,9 +35,9 @@ public class SeatGradeService {
                 savedSeatGrade.getName(),
                 savedSeatGrade.getPrice());
     }
+
     public List<SeatGradeResponse> findAllByConcert(Long concertId) {
         List<SeatGrade> seatGrades = seatGradeRepository.findAllByConcertId(concertId);
-
         return seatGrades.stream()
                 .map(sg -> new SeatGradeResponse(sg.getId(), sg.getName(), sg.getPrice())).toList();
     }

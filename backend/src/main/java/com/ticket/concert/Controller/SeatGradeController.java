@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,10 +21,14 @@ public class SeatGradeController {
 
     @PostMapping
     public ResponseEntity<SeatGradeResponse> create(
+            Authentication authentication,
             @Valid @RequestBody SeatGradeCreateRequest request
     ) {
+        Long userId = (Long) authentication.getPrincipal();
+
         SeatGradeResponse response = seatGradeService.create(
                 request.getConcertId(),
+                userId,
                 request.getName(),
                 request.getPrice()
         );

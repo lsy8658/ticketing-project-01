@@ -29,6 +29,7 @@ public class ReservationService {
     private final ReservationSeatRepository reservationSeatRepository;
     private final RedissonClient redissonClient;
     private final StringRedisTemplate redisTemplate;
+    private final PaymentService paymentService;
 
     public Long create(Long userId, Long concertScheduleId, List<Long> scheduleSeatIds) {
 
@@ -59,6 +60,10 @@ public class ReservationService {
             List<ScheduleSeat> scheduleSeats =
                     scheduleSeatRepository.findAllById(scheduleSeatIds);
 
+            if (scheduleSeats.size() != scheduleSeatIds.size()) {
+                throw new CustomException(ErrorCode.SCHEDULE_SEAT_NOT_FOUND);
+            }
+
             for (ScheduleSeat scheduleSeat : scheduleSeats) {
                 if (!scheduleSeat.getConcertSchedule().getId().equals(concertScheduleId)) {
                     throw new CustomException(ErrorCode.SCHEDULE_SEAT_MISMATCH);
@@ -78,7 +83,7 @@ public class ReservationService {
                 redisTemplate.opsForValue().set(
                         "seat:hold:" + scheduleSeat.getId(),
                         "HOLD",
-                        2,
+                        1,
                         TimeUnit.MINUTES
                 );
             }
@@ -145,7 +150,16 @@ public class ReservationService {
             throw new CustomException(ErrorCode.RESERVATION_ALREADY_CANCELLED);
         }
 
+        paymentService.cancelByReservation(reservation, "예약 취소");
+
         reservation.cancel();
+
+        List<ReservationSeat> reservationSeats =
+                reservationSeatRepository.findAllByReservation(reservation);
+
+        for (ReservationSeat reservationSeat : reservationSeats) {
+            reservationSeat.getScheduleSeat().release();
+        }
     }
 
     public List<Reservation> getMyReservation(Long userId) {

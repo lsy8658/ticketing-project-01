@@ -9,4 +9,5 @@ import java.util.List;
 public interface SeatRepository extends JpaRepository<Seat, Long> {
     List<Seat> findAllByVenue(Venue venue);
     Boolean existsByVenueAndSeatNumber(Venue venue, String seatNumber);
+    List<Seat> findAllByVenueAndRowName(Venue venue, String rowName);
 }

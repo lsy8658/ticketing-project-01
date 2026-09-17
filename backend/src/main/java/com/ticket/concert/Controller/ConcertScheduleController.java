@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,9 +21,14 @@ public class ConcertScheduleController {
     private final ConcertScheduleService concertScheduleService;
 
     @PostMapping
-    public ResponseEntity<ConcertScheduleResponse> createConcertSchedule(@Valid @RequestBody ConcertScheduleCreateRequest request) {
+    public ResponseEntity<ConcertScheduleResponse> createConcertSchedule(
+            Authentication authentication,
+            @Valid @RequestBody ConcertScheduleCreateRequest request
+    ) {
+        Long userId = (Long) authentication.getPrincipal();
+
         ConcertScheduleResponse schedule = concertScheduleService.create(
-                request.getConcertId(), request.getVenueId(), request.getStartAt()
+                userId, request.getConcertId(), request.getVenueId(), request.getStartAt(), request.getEndAt()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(schedule);
     }
@@ -35,15 +41,23 @@ public class ConcertScheduleController {
 
     @PutMapping("/{scheduleId}")
     public ResponseEntity<ConcertScheduleResponse> updateConcertSchedule(
+            Authentication authentication,
             @PathVariable("scheduleId") Long scheduleId,
             @RequestBody ConcertScheduleUpdateRequest request
     ) {
-        ConcertScheduleResponse concertScheduleResponse = concertScheduleService.update(scheduleId, request);
-        return ResponseEntity.ok(concertScheduleResponse);
+        Long userId = (Long) authentication.getPrincipal();
+
+        ConcertScheduleResponse response = concertScheduleService.update(scheduleId, userId, request);
+        return ResponseEntity.ok(response);
     }
     @DeleteMapping("/{scheduleId}")
-    public ResponseEntity<Void> deleteConcertSchedule(@PathVariable("scheduleId") Long scheduleId) {
-        concertScheduleService.delete(scheduleId);
+    public ResponseEntity<Void> deleteConcertSchedule(
+            Authentication authentication,
+            @PathVariable("scheduleId") Long scheduleId
+    ) {
+        Long userId = (Long) authentication.getPrincipal();
+
+        concertScheduleService.delete(scheduleId, userId);
         return ResponseEntity.noContent().build();
     }
 }

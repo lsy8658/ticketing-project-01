@@ -26,18 +26,33 @@ public class ScheduleSeatService {
     private final SeatRepository seatRepository;
     private final SeatGradeRepository seatGradeRepository;
 
-    public void create(Long concertScheduleId, Long seatGradeId, List<Long> seatIds) {
+    public void create(Long userId, Long concertScheduleId, Long seatGradeId, List<Long> seatIds) {
         ConcertSchedule schedule = concertScheduleRepository.findById(concertScheduleId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_SCHEDULE_NOT_FOUND));
 
+        if (!schedule.getConcert().getCreateBy().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
+
         SeatGrade seatGrade = seatGradeRepository.findById(seatGradeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.SEAT_GRADE_NOT_FOUND));
+
+        if (!seatGrade.getConcert().getId().equals(schedule.getConcert().getId())) {
+            throw new CustomException(ErrorCode.SEAT_GRADE_NOT_FOUND);
+        }
 
         if (scheduleSeatRepository.existsByConcertScheduleAndSeatIdIn(schedule, seatIds)) {
             throw new CustomException(ErrorCode.SCHEDULE_SEAT_ALREADY_EXISTS);
         }
 
         List<Seat> seats = seatRepository.findAllById(seatIds);
+
+        boolean allMatch = seats.stream()
+                .allMatch(seat -> seat.getVenue().getId().equals(schedule.getVenue().getId()));
+
+        if (!allMatch) {
+            throw new CustomException(ErrorCode.SCHEDULE_SEAT_MISMATCH);
+        }
 
         List<ScheduleSeat> scheduleSeats = seats.stream()
                 .map(seat -> new ScheduleSeat(schedule, seat, seatGrade))

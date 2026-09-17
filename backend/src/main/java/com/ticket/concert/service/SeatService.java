@@ -47,9 +47,13 @@ public class SeatService {
         );
     }
 
-    public List<SeatResponse> createBulk(Long venueId, List<SeatBulkCreateRequest.RowRequest> rows) {
+    public List<SeatResponse> createBulk(Long userId, Long venueId, List<SeatBulkCreateRequest.RowRequest> rows) {
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
+
+        if (!venue.getCreateBy().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.FORBIDDEN);
+        }
 
         List<Seat> seats = new ArrayList<>();
 

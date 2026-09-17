@@ -33,7 +33,11 @@ public enum ErrorCode {
     ROLE_REQUEST_ALREADY_PROCESSED(HttpStatus.CONFLICT, "이미 처리된 권한 신청입니다."),
     ROLE_REQUEST_INVALID(HttpStatus.BAD_REQUEST, "유효하지 않은 권한 신청입니다."),
     CONCERT_HAS_SCHEDULE(HttpStatus.CONFLICT, "공연 일정이 있는 콘서트는 삭제할 수 없습니다."),
-    CONCERT_SALES_PERIOD_INVALID(HttpStatus.BAD_REQUEST, "판매 시작일은 마감일보다 빨라야 합니다.");
+    CONCERT_SALES_PERIOD_INVALID(HttpStatus.BAD_REQUEST, "판매 시작일은 마감일보다 빨라야 합니다."),
+    VENUE_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 등록된 공연장입니다."),
+    INVALID_GRADE_NAME(HttpStatus.BAD_REQUEST, "존재하지 않는 등급명입니다."),
+    CONCERT_SCHEDULE_PERIOD_INVALID(HttpStatus.BAD_REQUEST, "공연 시작시간은 종료시간보다 빨라야 합니다."),
+    PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "결제 정보를 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;

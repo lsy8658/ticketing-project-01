@@ -52,6 +52,8 @@ public class SecurityConfig {
                                         "/v3/api-docs",
                                         "/v3/api-docs/**"
                                 ).permitAll()
+                                .requestMatchers("/api/concerts/my")
+                                .hasAnyRole("MANAGER", "ADMIN")
                                 .requestMatchers(HttpMethod.GET,
                                         "/api/concerts/**",
                                         "/api/venues/**",
@@ -71,6 +73,8 @@ public class SecurityConfig {
                                 ).hasAnyRole("MANAGER", "ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/api/user/users").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.PATCH, "/api/user/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/api/role-requests").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PATCH, "/api/role-requests/**").hasRole("ADMIN")
                                 .requestMatchers(
                                         "/api/user/**",
                                         "/api/payments/confirm"

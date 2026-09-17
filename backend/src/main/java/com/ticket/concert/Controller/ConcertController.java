@@ -53,14 +53,14 @@ public class ConcertController {
         return ResponseEntity.ok(concerts);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<ConcertResponse> updateConcert (
             Authentication authentication,
             @PathVariable("id") Long id,
             @RequestBody ConcertUpdateRequest request
     ) {
         Long userId = (Long) authentication.getPrincipal();
-        ConcertResponse concert = concertService.update(userId, id, request);
+        ConcertResponse concert = concertService.update(id, userId, request);
         return ResponseEntity.ok(concert);
     }
 
