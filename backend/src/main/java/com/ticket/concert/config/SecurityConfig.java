@@ -54,12 +54,15 @@ public class SecurityConfig {
                                 ).permitAll()
                                 .requestMatchers("/api/concerts/my")
                                 .hasAnyRole("MANAGER", "ADMIN")
+                                .requestMatchers("/api/venues/mine")
+                                .hasAnyRole("MANAGER", "ADMIN")
                                 .requestMatchers(HttpMethod.GET,
                                         "/api/concerts/**",
-                                        "/api/venues/**",
+                                        "/api/venues",
                                         "/api/concert-schedules/**",
                                         "/api/seat-grades/**",
-                                        "/api/seats/**"
+                                        "/api/seats/**",
+                                        "/api/schedule-seat/**"
                                 ).permitAll()
                                 .requestMatchers(
                                         "/api/concerts/**",

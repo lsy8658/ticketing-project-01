@@ -1,7 +1,6 @@
 package com.ticket.concert.Controller;
 
 import com.ticket.concert.dto.SeatBulkCreateRequest;
-import com.ticket.concert.dto.SeatCreateRequest;
 import com.ticket.concert.dto.SeatResponse;
 import com.ticket.concert.service.SeatService;
 import jakarta.validation.Valid;

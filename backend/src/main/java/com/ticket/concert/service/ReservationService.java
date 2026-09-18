@@ -2,6 +2,7 @@ package com.ticket.concert.service;
 
 import com.ticket.concert.domain.*;
 import com.ticket.concert.dto.ReservationDetailResponse;
+import com.ticket.concert.dto.ReservationResponse;
 import com.ticket.concert.exception.CustomException;
 import com.ticket.concert.exception.ErrorCode;
 import com.ticket.concert.repository.*;
@@ -12,7 +13,9 @@ import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -30,18 +33,14 @@ public class ReservationService {
     private final RedissonClient redissonClient;
     private final StringRedisTemplate redisTemplate;
     private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
+    private final TransactionTemplate transactionTemplate;
 
     public Long create(Long userId, Long concertScheduleId, List<Long> scheduleSeatIds) {
 
         if (scheduleSeatIds.size() > 4) {
             throw new CustomException(ErrorCode.RESERVATION_SEAT_LIMIT_EXCEEDED);
         }
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        ConcertSchedule concertSchedule = concertScheduleRepository.findById(concertScheduleId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_SCHEDULE_NOT_FOUND));
 
         scheduleSeatIds.sort(Long::compareTo);
 
@@ -54,48 +53,57 @@ public class ReservationService {
         log.info("락 획득 완료");
 
         try {
-            Reservation reservation = new Reservation(user, concertSchedule);
-            Reservation savedReservation = reservationRepository.save(reservation);
+            return transactionTemplate.execute(status -> {
 
-            List<ScheduleSeat> scheduleSeats =
-                    scheduleSeatRepository.findAllById(scheduleSeatIds);
+                User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-            if (scheduleSeats.size() != scheduleSeatIds.size()) {
-                throw new CustomException(ErrorCode.SCHEDULE_SEAT_NOT_FOUND);
-            }
+                ConcertSchedule concertSchedule = concertScheduleRepository.findById(concertScheduleId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_SCHEDULE_NOT_FOUND));
 
-            for (ScheduleSeat scheduleSeat : scheduleSeats) {
-                if (!scheduleSeat.getConcertSchedule().getId().equals(concertScheduleId)) {
-                    throw new CustomException(ErrorCode.SCHEDULE_SEAT_MISMATCH);
+                Reservation reservation = new Reservation(user, concertSchedule);
+                Reservation savedReservation = reservationRepository.save(reservation);
+
+                List<ScheduleSeat> scheduleSeats =
+                        scheduleSeatRepository.findAllById(scheduleSeatIds);
+
+                if (scheduleSeats.size() != scheduleSeatIds.size()) {
+                    throw new CustomException(ErrorCode.SCHEDULE_SEAT_NOT_FOUND);
                 }
 
-                if (scheduleSeat.getStatus() != SeatStatus.AVAILABLE) {
-                    throw new CustomException(ErrorCode.SEAT_ALREADY_TAKEN);
+                for (ScheduleSeat scheduleSeat : scheduleSeats) {
+                    if (!scheduleSeat.getConcertSchedule().getId().equals(concertScheduleId)) {
+                        throw new CustomException(ErrorCode.SCHEDULE_SEAT_MISMATCH);
+                    }
+
+                    if (scheduleSeat.getStatus() != SeatStatus.AVAILABLE) {
+                        throw new CustomException(ErrorCode.SEAT_ALREADY_TAKEN);
+                    }
                 }
-            }
 
-            for (ScheduleSeat scheduleSeat : scheduleSeats) {
-                scheduleSeat.hold();
+                for (ScheduleSeat scheduleSeat : scheduleSeats) {
+                    scheduleSeat.hold();
 
-                log.info("Redis 저장 : {}", scheduleSeat.getId());
-                log.info("Connection Factory : {}", redisTemplate.getConnectionFactory());
+                    log.info("Redis 저장 : {}", scheduleSeat.getId());
+                    log.info("Connection Factory : {}", redisTemplate.getConnectionFactory());
 
-                redisTemplate.opsForValue().set(
-                        "seat:hold:" + scheduleSeat.getId(),
-                        "HOLD",
-                        1,
-                        TimeUnit.MINUTES
-                );
-            }
+                    redisTemplate.opsForValue().set(
+                            "seat:hold:" + scheduleSeat.getId(),
+                            "HOLD",
+                            1,
+                            TimeUnit.MINUTES
+                    );
+                }
 
-            List<ReservationSeat> reservationSeats = scheduleSeats.stream()
-                    .map(scheduleSeat ->
-                            new ReservationSeat(savedReservation, scheduleSeat))
-                    .toList();
+                List<ReservationSeat> reservationSeats = scheduleSeats.stream()
+                        .map(scheduleSeat ->
+                                new ReservationSeat(savedReservation, scheduleSeat))
+                        .toList();
 
-            reservationSeatRepository.saveAll(reservationSeats);
+                reservationSeatRepository.saveAll(reservationSeats);
 
-            return savedReservation.getId();
+                return savedReservation.getId();
+            });
 
         } finally {
             locks.forEach(RLock::unlock);
@@ -150,7 +158,13 @@ public class ReservationService {
             throw new CustomException(ErrorCode.RESERVATION_ALREADY_CANCELLED);
         }
 
-        paymentService.cancelByReservation(reservation, "예약 취소");
+        if (reservation.getConcertSchedule().getStartAt().isBefore(LocalDateTime.now().plusDays(1))) {
+            throw new CustomException(ErrorCode.RESERVATION_CANCEL_DEADLINE_PASSED);
+        }
+
+        if (paymentRepository.existsByReservation(reservation)) {
+            paymentService.cancelByReservation(reservation, "예약 취소");
+        }
 
         reservation.cancel();
 
@@ -162,10 +176,13 @@ public class ReservationService {
         }
     }
 
-    public List<Reservation> getMyReservation(Long userId) {
+    @Transactional(readOnly = true)
+    public List<ReservationResponse> getMyReservation(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        return reservationRepository.findAllByUser(user);
+        return reservationRepository.findAllByUser(user).stream()
+                .map(ReservationResponse::from)
+                .toList();
     }
 }

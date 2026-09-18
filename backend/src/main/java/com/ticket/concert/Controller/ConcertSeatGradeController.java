@@ -5,6 +5,7 @@ import com.ticket.concert.dto.ConcertSeatGradeStatusResponse;
 import com.ticket.concert.service.ConcertSeatGradeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -22,22 +23,17 @@ public class ConcertSeatGradeController {
             Authentication authentication,
             @PathVariable("concertId") Long concertId,
             @Valid @RequestBody ConcertSeatGradeRequest request
-            ) {
+    ) {
         Long userId = (Long) authentication.getPrincipal();
-        concertSeatGradeService.assign(
-                concertId,
-                userId,
-                request.getRowName(),
-                request.getSeatGradeId()
-        );
-        return ResponseEntity.noContent().build();
+        concertSeatGradeService.assign(concertId, userId, request.getRowName(), request.getSeatGradeId());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/{concertId}")
+    @GetMapping("/{concertId}/status")
     public ResponseEntity<List<ConcertSeatGradeStatusResponse>> getStatus(
             @PathVariable("concertId") Long concertId
     ) {
-        return ResponseEntity.ok(concertSeatGradeService.getStatus(concertId));
+        List<ConcertSeatGradeStatusResponse> response = concertSeatGradeService.getStatus(concertId);
+        return ResponseEntity.ok(response);
     }
-
 }

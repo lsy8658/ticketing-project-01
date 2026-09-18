@@ -37,7 +37,9 @@ public enum ErrorCode {
     VENUE_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 등록된 공연장입니다."),
     INVALID_GRADE_NAME(HttpStatus.BAD_REQUEST, "존재하지 않는 등급명입니다."),
     CONCERT_SCHEDULE_PERIOD_INVALID(HttpStatus.BAD_REQUEST, "공연 시작시간은 종료시간보다 빨라야 합니다."),
-    PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "결제 정보를 찾을 수 없습니다.");
+    PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "결제 정보를 찾을 수 없습니다."),
+    VENUE_HAS_SCHEDULE(HttpStatus.CONFLICT, "공연 일정이 있는 공연장은 삭제할 수 없습니다."),
+    RESERVATION_CANCEL_DEADLINE_PASSED(HttpStatus.BAD_REQUEST, "공연 하루 전부터는 예약을 취소할 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;

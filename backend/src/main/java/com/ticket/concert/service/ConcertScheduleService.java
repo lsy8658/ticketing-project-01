@@ -53,8 +53,10 @@ public class ConcertScheduleService {
         return ConcertScheduleResponse.from(savedSchedule);
     }
 
-    public List<ConcertSchedule> getConcertSchedules(Long concertId) {
-        return concertScheduleRepository.findAllByConcertId(concertId);
+    public List<ConcertScheduleResponse> getConcertSchedules(Long concertId) {
+        return concertScheduleRepository.findAllByConcertId(concertId).stream()
+                .map(ConcertScheduleResponse::from)
+                .toList();
     }
 
     @Transactional

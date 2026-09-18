@@ -21,32 +21,6 @@ public class SeatService {
     private final SeatRepository seatRepository;
     private final VenueRepository venueRepository;
 
-    public SeatResponse create(
-            Long venueId,
-            String seatNumber,
-            String rowName,
-            int priority
-    ) {
-        Venue venue = venueRepository.findById(venueId)
-                .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
-
-        Boolean exists = seatRepository.existsByVenueAndSeatNumber(venue, seatNumber);
-
-        if (exists) {
-            throw new CustomException(ErrorCode.SEAT_ALREADY_EXISTS);
-        }
-
-        Seat seat = new Seat(venue, seatNumber, rowName, priority);
-        Seat savedSeat = seatRepository.save(seat);
-
-        return new SeatResponse(
-                savedSeat.getId(),
-                savedSeat.getSeatNumber(),
-                savedSeat.getRowName(),
-                savedSeat.getPriority()
-        );
-    }
-
     public List<SeatResponse> createBulk(Long userId, Long venueId, List<SeatBulkCreateRequest.RowRequest> rows) {
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));

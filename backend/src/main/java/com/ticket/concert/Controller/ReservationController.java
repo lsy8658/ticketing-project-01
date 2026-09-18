@@ -4,6 +4,7 @@ package com.ticket.concert.Controller;
 import com.ticket.concert.domain.Reservation;
 import com.ticket.concert.dto.ReservationCreateRequest;
 import com.ticket.concert.dto.ReservationDetailResponse;
+import com.ticket.concert.dto.ReservationResponse;
 import com.ticket.concert.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,11 @@ public class ReservationController {
     private final ReservationService reservationService;
 
     @GetMapping
-    public ResponseEntity<List<Reservation>> getMyReservations(
+    public ResponseEntity<List<ReservationResponse>> getMyReservations(
             Authentication authentication
     ) {
         Long userId = (Long) authentication.getPrincipal();
-        List<Reservation> reservations = reservationService.getMyReservation(userId);
+        List<ReservationResponse> reservations = reservationService.getMyReservation(userId);
         return ResponseEntity.ok(reservations);
     }
 

@@ -6,6 +6,7 @@ import com.ticket.concert.dto.VenueResponse;
 import com.ticket.concert.dto.VenueUpdateRequest;
 import com.ticket.concert.exception.CustomException;
 import com.ticket.concert.exception.ErrorCode;
+import com.ticket.concert.repository.ConcertScheduleRepository;
 import com.ticket.concert.repository.UserRepository;
 import com.ticket.concert.repository.VenueRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.List;
 public class VenueService {
     private final VenueRepository venueRepository;
     private final UserRepository userRepository;
+    private final ConcertScheduleRepository concertScheduleRepository;
 
     public Long create (Long userId, String name, String address) {
         User user = userRepository.findById(userId)
@@ -65,6 +67,10 @@ public class VenueService {
     @Transactional
     public void delete(Long venueId, Long userId) {
         Venue venue = findOwned(venueId, userId);
+
+        if (concertScheduleRepository.existsByVenue(venue)) {
+            throw new CustomException(ErrorCode.VENUE_HAS_SCHEDULE);
+        }
         venueRepository.delete(venue);
     }
 }

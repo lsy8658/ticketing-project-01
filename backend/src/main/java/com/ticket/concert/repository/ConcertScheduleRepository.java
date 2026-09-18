@@ -27,4 +27,5 @@ public interface ConcertScheduleRepository extends JpaRepository<ConcertSchedule
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+    boolean existsByVenue(Venue venue);
 }

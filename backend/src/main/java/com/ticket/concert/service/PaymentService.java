@@ -2,6 +2,7 @@ package com.ticket.concert.service;
 
 import com.ticket.concert.domain.*;
 import com.ticket.concert.dto.PaymentRequest;
+import com.ticket.concert.dto.PaymentResponse;
 import com.ticket.concert.exception.CustomException;
 import com.ticket.concert.exception.ErrorCode;
 import com.ticket.concert.repository.PaymentRepository;
@@ -108,11 +109,13 @@ public class PaymentService {
     }
 
     @Transactional(readOnly = true)
-    public List<Payment> getMyPayments(Long userId) {
+    public List<PaymentResponse> getMyPayments(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        return paymentRepository.findAllByReservation_User(user);
+        return paymentRepository.findAllByReservation_User(user).stream()
+                .map(PaymentResponse::from)
+                .toList();
     }
 
     public void cancelByReservation(Reservation reservation, String reason) {

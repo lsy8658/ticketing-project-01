@@ -1,8 +1,8 @@
 package com.ticket.concert.Controller;
 
 
-import com.ticket.concert.domain.Payment;
 import com.ticket.concert.dto.PaymentRequest;
+import com.ticket.concert.dto.PaymentResponse;
 import com.ticket.concert.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +21,11 @@ public class PaymentController {
 
 
     @GetMapping
-    public ResponseEntity<List<Payment>> getMyPayments(
+    public ResponseEntity<List<PaymentResponse>> getMyPayments(
             Authentication authentication
     ) {
         Long userId = (Long) authentication.getPrincipal();
-        List<Payment> payments = paymentService.getMyPayments(userId);
+        List<PaymentResponse> payments = paymentService.getMyPayments(userId);
         return ResponseEntity.ok(payments);
     }
 

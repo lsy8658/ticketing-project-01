@@ -1,6 +1,5 @@
 package com.ticket.concert.Controller;
 
-import com.ticket.concert.domain.ConcertSchedule;
 import com.ticket.concert.dto.ConcertScheduleCreateRequest;
 import com.ticket.concert.dto.ConcertScheduleResponse;
 import com.ticket.concert.dto.ConcertScheduleUpdateRequest;
@@ -34,8 +33,8 @@ public class ConcertScheduleController {
     }
 
     @GetMapping("/{concertId}/schedules")
-    public ResponseEntity<List<ConcertSchedule>> getConcertSchedules (@PathVariable("concertId") Long concertId) {
-        List<ConcertSchedule> concertSchedules = concertScheduleService.getConcertSchedules(concertId);
+    public ResponseEntity<List<ConcertScheduleResponse>> getConcertSchedules(@PathVariable("concertId") Long concertId) {
+        List<ConcertScheduleResponse> concertSchedules = concertScheduleService.getConcertSchedules(concertId);
         return ResponseEntity.ok(concertSchedules);
     }
 

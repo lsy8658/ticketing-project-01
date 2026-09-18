@@ -91,15 +91,7 @@ public class ConcertService {
 
     public List<ConcertResponse> findAll() {
         return concertRepository.findAll().stream()
-                .map(c -> new ConcertResponse(c.getId(), c.getTitle(), c.getDescription(), c.getImageUrl(),
-                        c.getStatus(), c.getSalesStartAt(), c.getSalesEndAt(), getImages(c)))
-                .toList();
-    }
-
-    public List<ConcertResponse> findMine(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        return concertRepository.findAllByCreateBy(user).stream()
+                .filter(c -> c.getStatus() != ConcertStatus.SUSPENDED)
                 .map(c -> new ConcertResponse(c.getId(), c.getTitle(), c.getDescription(), c.getImageUrl(),
                         c.getStatus(), c.getSalesStartAt(), c.getSalesEndAt(), getImages(c)))
                 .toList();
@@ -159,13 +151,7 @@ public class ConcertService {
             return;
         }
 
-        List<ConcertImage> images = concertImageRepository.findAllByConcertOrderBySortOrderAsc(concert);
-        for (ConcertImage image : images) {
-            imageUploadService.delete(image.getPublicId());
-        }
-        concertImageRepository.deleteAllByConcert(concert);
-
-        concertRepository.deleteById(id);
+        processRemoval(concert);
     }
 
     @Transactional
@@ -178,7 +164,7 @@ public class ConcertService {
                         .orElse(false))
                 .toList();
 
-        if (paidReservations.isEmpty()) {
+        if (reservations.isEmpty()) {
             List<ConcertSchedule> schedules = concertScheduleRepository.findAllByConcertId(concert.getId());
             for (ConcertSchedule schedule : schedules) {
                 scheduleSeatRepository.deleteAllByConcertSchedule(schedule);
