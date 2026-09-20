@@ -45,6 +45,11 @@ public class VenueController {
         return ResponseEntity.ok(venueService.findMine(userId));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<VenueResponse> getVenue(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(venueService.findById(id));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<VenueResponse> upadte(
             Authentication authentication,

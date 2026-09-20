@@ -48,6 +48,12 @@ public class VenueService {
                 .toList();
     }
 
+    public VenueResponse findById(Long venueId) {
+        Venue venue = venueRepository.findById(venueId)
+                .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
+        return VenueResponse.from(venue);
+    }
+
     public Venue findOwned(Long venueId, Long userId) {
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
