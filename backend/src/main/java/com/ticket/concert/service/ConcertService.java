@@ -164,7 +164,7 @@ public class ConcertService {
                         .orElse(false))
                 .toList();
 
-        if (reservations.isEmpty()) {
+        if (paidReservations.isEmpty()) {
             List<ConcertSchedule> schedules = concertScheduleRepository.findAllByConcertId(concert.getId());
             for (ConcertSchedule schedule : schedules) {
                 scheduleSeatRepository.deleteAllByConcertSchedule(schedule);

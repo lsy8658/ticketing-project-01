@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -137,6 +136,7 @@ public class ReservationService {
         return new ReservationDetailResponse(reservationId,seatInfos,totalAmount);
     }
 
+    @Transactional
     public void release(Long scheduleSeatId) {
 
         ScheduleSeat scheduleSeat = scheduleSeatRepository.findById(scheduleSeatId)
@@ -145,6 +145,7 @@ public class ReservationService {
         scheduleSeat.release();
     }
 
+    @Transactional
     public void cancelReservation(Long reservationId, Long userId) {
 
         Reservation reservation = reservationRepository.findById(reservationId)
