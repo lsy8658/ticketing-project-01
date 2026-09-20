@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,6 +17,14 @@ import java.util.List;
 @RequestMapping("/api/seats")
 public class SeatController {
     private final SeatService seatService;
+
+    @GetMapping("/venue/{venueId}")
+    public ResponseEntity<List<SeatResponse>> getByVenue(
+            @PathVariable("venueId") Long venueId
+    ) {
+        List<SeatResponse> response = seatService.findAllByVenue(venueId);
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping
     public ResponseEntity<List<SeatResponse>> create(
@@ -30,4 +35,5 @@ public class SeatController {
         List<SeatResponse> seats = seatService.createBulk(userId, request.getVenueId(), request.getRows());
         return ResponseEntity.status(HttpStatus.CREATED).body(seats);
     }
+
 }

@@ -52,4 +52,15 @@ public class SeatService {
                                 seat.getPriority())
                 ).toList();
     }
+
+    public List<SeatResponse> findAllByVenue(Long venueId) {
+        return seatRepository.findAllByVenue(
+                        venueRepository.findById(venueId)
+                                .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND))
+                ).stream()
+                .map(seat -> new SeatResponse(
+                        seat.getId(), seat.getSeatNumber(), seat.getRowName(), seat.getPriority()
+                ))
+                .toList();
+    }
 }
