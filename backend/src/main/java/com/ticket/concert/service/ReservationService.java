@@ -143,6 +143,14 @@ public class ReservationService {
                 .orElseThrow(() -> new CustomException(ErrorCode.SCHEDULE_SEAT_NOT_FOUND));
 
         scheduleSeat.release();
+
+        reservationSeatRepository.findByScheduleSeat(scheduleSeat)
+                .ifPresent(reservationSeat -> {
+                    Reservation reservation = reservationSeat.getReservation();
+                    if (reservation.getStatus() == ReservationStatus.RESERVED) {
+                        reservation.cancel();
+                    }
+                });
     }
 
     @Transactional

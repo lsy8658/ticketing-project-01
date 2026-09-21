@@ -75,7 +75,7 @@ public class ConcertScheduleService {
             throw new CustomException(ErrorCode.CONCERT_SCHEDULE_PERIOD_INVALID);
         }
 
-        if (reservationRepository.existsByConcertSchedule(schedule)) {
+        if (reservationRepository.existsByConcertScheduleAndStatus(schedule, ReservationStatus.RESERVED)) {
             throw new CustomException(ErrorCode.CONCERT_SCHEDULE_HAS_RESERVATION);
         }
 
@@ -99,7 +99,7 @@ public class ConcertScheduleService {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
 
-        if (reservationRepository.existsByConcertSchedule(schedule)) {
+        if (reservationRepository.existsByConcertScheduleAndStatus(schedule, ReservationStatus.RESERVED)) {
             throw new CustomException(ErrorCode.CONCERT_SCHEDULE_HAS_RESERVATION);
         }
 
