@@ -1,7 +1,9 @@
 package com.ticket.concert.service;
 
+import com.ticket.concert.config.JwtProvider;
 import com.ticket.concert.domain.User;
 import com.ticket.concert.domain.UserRole;
+import com.ticket.concert.dto.LoginResponse;
 import com.ticket.concert.exception.CustomException;
 import com.ticket.concert.exception.ErrorCode;
 import com.ticket.concert.repository.UserRepository;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
 
     public Long signUp(String email, String password, String nickname) {
         userRepository.findByEmail(email)
@@ -28,11 +31,15 @@ public class AuthService {
         return userRepository.save(user).getId();
     }
 
-    public User login (String email, String password) {
+    public LoginResponse  login (String email, String password) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new CustomException(ErrorCode.LOGIN_FAILED));
+
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new CustomException(ErrorCode.LOGIN_FAILED);
         }
-        return user;
+
+        String token = jwtProvider.createToken(user.getId(), user.getEmail(), user.getRole());
+
+        return new LoginResponse(token, user.getId(), user.getEmail(), user.getNickname(),user.getRole());
     }
 }

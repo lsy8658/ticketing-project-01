@@ -1,11 +1,10 @@
 package com.ticket.concert.Controller;
 
 import com.ticket.concert.config.JwtProvider;
-import com.ticket.concert.domain.User;
 import com.ticket.concert.dto.LoginRequest;
+import com.ticket.concert.dto.LoginResponse;
 import com.ticket.concert.dto.SignupRequest;
 import com.ticket.concert.service.AuthService;
-import com.ticket.concert.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,9 +28,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest request) {
-        User user = authService.login(request.getEmail(), request.getPassword());
-        String token = jwtProvider.createToken(user.getId(), user.getEmail(), user.getRole());
-        return ResponseEntity.ok(token);
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        LoginResponse response = authService.login(request.getEmail(), request.getPassword());
+        return ResponseEntity.ok(response);
     }
 }
