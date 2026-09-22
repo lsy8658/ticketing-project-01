@@ -35,10 +35,6 @@ public class ConcertScheduleService {
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
 
-        if (!venue.getCreateBy().getId().equals(userId)) {
-            throw new CustomException(ErrorCode.FORBIDDEN);
-        }
-
         if (!startAt.isBefore(endAt)) {
             throw new CustomException(ErrorCode.CONCERT_SCHEDULE_PERIOD_INVALID);
         }

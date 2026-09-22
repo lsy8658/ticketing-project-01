@@ -25,10 +25,6 @@ public class SeatService {
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
 
-        if (!venue.getCreateBy().getId().equals(userId)) {
-            throw new CustomException(ErrorCode.FORBIDDEN);
-        }
-
         List<Seat> seats = new ArrayList<>();
 
         for (SeatBulkCreateRequest.RowRequest row : rows) {

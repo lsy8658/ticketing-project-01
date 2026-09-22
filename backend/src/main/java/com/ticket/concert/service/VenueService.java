@@ -55,12 +55,8 @@ public class VenueService {
     }
 
     public Venue findOwned(Long venueId, Long userId) {
-        Venue venue = venueRepository.findById(venueId)
+        return venueRepository.findById(venueId)
                 .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
-        if (!venue.getCreateBy().getId().equals(userId)) {
-            throw new CustomException(ErrorCode.FORBIDDEN);
-        }
-        return venue;
     }
 
     @Transactional
