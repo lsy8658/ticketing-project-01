@@ -8,6 +8,8 @@ import com.ticket.concert.exception.CustomException;
 import com.ticket.concert.exception.ErrorCode;
 import com.ticket.concert.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,31 +24,40 @@ public class ConcertScheduleService {
     private final VenueRepository venueRepository;
     private final ScheduleSeatRepository scheduleSeatRepository;
     private final ReservationRepository reservationRepository;
+    private final RedissonClient redissonClient;
 
     @Transactional
     public ConcertScheduleResponse create(Long userId, Long concertId, Long venueId, LocalDateTime startAt, LocalDateTime endAt) {
-        Concert concert = concertRepository.findById(concertId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_NOT_FOUND));
+        RLock lock = redissonClient.getLock("venue:" + venueId + ":date:" + startAt.toLocalDate());
+        lock.lock();
 
-        if (!concert.getCreateBy().getId().equals(userId)) {
-            throw new CustomException(ErrorCode.FORBIDDEN);
+        try {
+            Concert concert = concertRepository.findById(concertId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_NOT_FOUND));
+
+            if (!concert.getCreateBy().getId().equals(userId)) {
+                throw new CustomException(ErrorCode.FORBIDDEN);
+            }
+
+            Venue venue = venueRepository.findById(venueId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
+
+            if (!startAt.isBefore(endAt)) {
+                throw new CustomException(ErrorCode.CONCERT_SCHEDULE_PERIOD_INVALID);
+            }
+
+            if (concertScheduleRepository.existsOverlappingSchedule(venue, startAt.toLocalDate(), endAt.toLocalDate())) {
+                throw new CustomException(ErrorCode.CONCERT_SCHEDULE_ALREADY_EXISTS);
+            }
+
+            ConcertSchedule schedule = new ConcertSchedule(concert, venue, startAt, endAt);
+            ConcertSchedule savedSchedule = concertScheduleRepository.save(schedule);
+
+            return ConcertScheduleResponse.from(savedSchedule);
+        } finally {
+            lock.unlock();
         }
 
-        Venue venue = venueRepository.findById(venueId)
-                .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
-
-        if (!startAt.isBefore(endAt)) {
-            throw new CustomException(ErrorCode.CONCERT_SCHEDULE_PERIOD_INVALID);
-        }
-
-        if (concertScheduleRepository.existsOverlappingSchedule(venue, startAt.toLocalDate(), endAt.toLocalDate())) {
-            throw new CustomException(ErrorCode.CONCERT_SCHEDULE_ALREADY_EXISTS);
-        }
-
-        ConcertSchedule schedule = new ConcertSchedule(concert, venue, startAt, endAt);
-        ConcertSchedule savedSchedule = concertScheduleRepository.save(schedule);
-
-        return ConcertScheduleResponse.from(savedSchedule);
     }
 
     public List<ConcertScheduleResponse> getConcertSchedules(Long concertId) {

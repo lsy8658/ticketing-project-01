@@ -39,6 +39,10 @@ public class ConcertRegisterService {
             throw new CustomException(ErrorCode.CONCERT_SALES_PERIOD_INVALID);
         }
 
+        if (!request.getSalesEndAt().isBefore(request.getStartAt())) {
+            throw new CustomException(ErrorCode.CONCERT_SALES_PERIOD_INVALID);
+        }
+
         Concert concert = Concert.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())

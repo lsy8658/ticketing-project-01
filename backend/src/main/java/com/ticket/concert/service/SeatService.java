@@ -25,6 +25,12 @@ public class SeatService {
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
 
+        int newSeatCount = rows.stream().mapToInt(SeatBulkCreateRequest.RowRequest::getSeatCount).sum();
+        int existingSeatCount = seatRepository.findAllByVenue(venue).size();
+        if (existingSeatCount + newSeatCount > venue.getCapacity()) {
+            throw new CustomException(ErrorCode.SEAT_CAPACITY_EXCEEDED);
+        }
+
         List<Seat> seats = new ArrayList<>();
 
         for (SeatBulkCreateRequest.RowRequest row : rows) {

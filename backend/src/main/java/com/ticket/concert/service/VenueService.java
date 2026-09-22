@@ -7,6 +7,7 @@ import com.ticket.concert.dto.VenueUpdateRequest;
 import com.ticket.concert.exception.CustomException;
 import com.ticket.concert.exception.ErrorCode;
 import com.ticket.concert.repository.ConcertScheduleRepository;
+import com.ticket.concert.repository.SeatRepository;
 import com.ticket.concert.repository.UserRepository;
 import com.ticket.concert.repository.VenueRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +22,9 @@ public class VenueService {
     private final VenueRepository venueRepository;
     private final UserRepository userRepository;
     private final ConcertScheduleRepository concertScheduleRepository;
+    private final SeatRepository seatRepository;
 
-    public Long create (Long userId, String name, String address) {
+    public Long create (Long userId, String name, String address, int capacity, String managerPhone) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -30,7 +32,7 @@ public class VenueService {
             throw new CustomException(ErrorCode.VENUE_ALREADY_EXISTS);
         }
 
-        Venue venue = new Venue(name, address, user);
+        Venue venue = new Venue(name, address, capacity, managerPhone, user);
         return venueRepository.save(venue).getId();
     }
 
@@ -62,7 +64,7 @@ public class VenueService {
     @Transactional
     public VenueResponse update(Long venueId, Long userId, VenueUpdateRequest request) {
         Venue venue = findOwned(venueId, userId);
-        venue.update(request.getName(), request.getAddress());
+        venue.update(request.getName(), request.getAddress(), request.getCapacity(), request.getManagerPhone());
         return VenueResponse.from(venue);
     }
 
@@ -72,6 +74,10 @@ public class VenueService {
 
         if (concertScheduleRepository.existsByVenue(venue)) {
             throw new CustomException(ErrorCode.VENUE_HAS_SCHEDULE);
+        }
+
+        if (seatRepository.existsByVenue(venue)) {
+            throw new CustomException(ErrorCode.VENUE_HAS_SEATS);
         }
         venueRepository.delete(venue);
     }

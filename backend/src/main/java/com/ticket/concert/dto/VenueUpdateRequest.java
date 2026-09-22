@@ -6,4 +6,6 @@ import lombok.Getter;
 public class VenueUpdateRequest {
     private String name;
     private String address;
+    private int capacity;
+    private String managerPhone;
 }

@@ -89,7 +89,7 @@ public class ReservationService {
                     redisTemplate.opsForValue().set(
                             "seat:hold:" + scheduleSeat.getId(),
                             "HOLD",
-                            1,
+                            2,
                             TimeUnit.MINUTES
                     );
                 }

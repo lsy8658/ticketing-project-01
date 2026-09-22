@@ -28,7 +28,8 @@ public class VenueController {
             @Valid @RequestBody VenueCreateRequest request
     ) {
         Long userId = (Long) authentication.getPrincipal();
-        Long venueId = venueService.create(userId, request.getName(), request.getAddress());
+        Long venueId = venueService.create(userId, request.getName(), request.getAddress(),
+                request.getCapacity(), request.getManagerPhone());
         return ResponseEntity.status(HttpStatus.CREATED).body(venueId);
     }
 
