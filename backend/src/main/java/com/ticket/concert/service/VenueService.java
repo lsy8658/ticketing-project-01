@@ -38,7 +38,7 @@ public class VenueService {
 
     public List<VenueResponse> findAll() {
         return venueRepository.findAll().stream()
-                .map(VenueResponse::from)
+                .map(venue -> VenueResponse.from(venue, seatRepository.existsByVenue(venue)))
                 .toList();
     }
 
@@ -46,14 +46,15 @@ public class VenueService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         return venueRepository.findAllByCreateBy(user).stream()
-                .map(VenueResponse::from)
+                .map(venue -> VenueResponse.from(venue, seatRepository.existsByVenue(venue)))
                 .toList();
     }
+
 
     public VenueResponse findById(Long venueId) {
         Venue venue = venueRepository.findById(venueId)
                 .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
-        return VenueResponse.from(venue);
+        return VenueResponse.from(venue, seatRepository.existsByVenue(venue));
     }
 
     public Venue findOwned(Long venueId, Long userId) {
@@ -65,7 +66,10 @@ public class VenueService {
     public VenueResponse update(Long venueId, Long userId, VenueUpdateRequest request) {
         Venue venue = findOwned(venueId, userId);
         venue.update(request.getName(), request.getAddress(), request.getCapacity(), request.getManagerPhone());
-        return VenueResponse.from(venue);
+        return VenueResponse.from(
+                venue,
+                seatRepository.existsByVenue(venue)
+        );
     }
 
     @Transactional
