@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface ConcertSeatGradeRepository extends JpaRepository<ConcertSeatGrade, Long> {
     List<ConcertSeatGrade> findAllByConcert(Concert concert);
     Optional<ConcertSeatGrade> findByConcertAndRowName(Concert concert, String rowName);
+    void deleteAllByConcert(Concert concert);
 }

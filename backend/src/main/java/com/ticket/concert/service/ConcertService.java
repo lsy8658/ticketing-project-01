@@ -27,6 +27,7 @@ public class ConcertService {
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
     private final PaymentService paymentService;
+    private final ConcertSeatGradeRepository concertSeatGradeRepository;
 
     private List<ImageInfo> getImages(Concert concert) {
         return concertImageRepository
@@ -170,7 +171,9 @@ public class ConcertService {
                 scheduleSeatRepository.deleteAllByConcertSchedule(schedule);
             }
             concertScheduleRepository.deleteAll(schedules);
+            concertSeatGradeRepository.deleteAllByConcert(concert);
             seatGradeRepository.deleteAllByConcert(concert);
+
 
             List<ConcertImage> images = concertImageRepository.findAllByConcertOrderBySortOrderAsc(concert);
             for (ConcertImage image : images) {
