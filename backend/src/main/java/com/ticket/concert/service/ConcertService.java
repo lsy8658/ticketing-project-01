@@ -28,6 +28,7 @@ public class ConcertService {
     private final UserRepository userRepository;
     private final PaymentService paymentService;
     private final ConcertSeatGradeRepository concertSeatGradeRepository;
+    private final ReservationSeatRepository reservationSeatRepository;
 
     private List<ImageInfo> getImages(Concert concert) {
         return concertImageRepository
@@ -166,6 +167,8 @@ public class ConcertService {
                 .toList();
 
         if (paidReservations.isEmpty()) {
+            reservationSeatRepository.deleteAllByReservationIn(reservations);
+            reservationRepository.deleteAll(reservations);
             List<ConcertSchedule> schedules = concertScheduleRepository.findAllByConcertId(concert.getId());
             for (ConcertSchedule schedule : schedules) {
                 scheduleSeatRepository.deleteAllByConcertSchedule(schedule);

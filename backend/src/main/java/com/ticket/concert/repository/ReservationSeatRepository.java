@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface ReservationSeatRepository extends JpaRepository<ReservationSeat, Long> {
     List<ReservationSeat> findAllByReservation(Reservation reservation);
     Optional<ReservationSeat> findByScheduleSeat(ScheduleSeat scheduleSeat);
+    void deleteAllByReservationIn(List<Reservation> reservations);
 }
