@@ -39,10 +39,6 @@ public class ConcertRegisterService {
             throw new CustomException(ErrorCode.CONCERT_SALES_PERIOD_INVALID);
         }
 
-        if (!request.getSalesEndAt().isBefore(request.getStartAt())) {
-            throw new CustomException(ErrorCode.CONCERT_SALES_PERIOD_INVALID);
-        }
-
         Concert concert = Concert.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -64,29 +60,27 @@ public class ConcertRegisterService {
 
         Map<String, Long> gradeNameToId = new HashMap<>();
         for (ConcertRegisterRequest.SeatGradeInfo info : request.getSeatGrades()) {
-
             if (gradeNameToId.containsKey(info.getName())) {
                 throw new CustomException(ErrorCode.INVALID_GRADE_NAME);
             }
-
             SeatGradeResponse grade = seatGradeService.create(
-                    savedConcert.getId(),
-                    userId,
-                    info.getName(),
-                    info.getPrice()
+                    savedConcert.getId(), userId, info.getName(), info.getPrice()
             );
-
             gradeNameToId.put(info.getName(), grade.getId());
         }
 
-            ConcertScheduleResponse schedule = concertScheduleService.create(
-                    userId,
-                    savedConcert.getId(), request.getVenueId(),
-                    request.getStartAt(), request.getEndAt());
+        for (ConcertRegisterRequest.ScheduleInfo scheduleInfo : request.getSchedules()) {
 
-            Venue venue = venueRepository.findById(request.getVenueId())
-                    .orElseThrow(() ->
-                            new CustomException(ErrorCode.VENUE_NOT_FOUND));
+            if (!scheduleInfo.getStartAt().isBefore(scheduleInfo.getEndAt())) {
+                throw new CustomException(ErrorCode.CONCERT_SCHEDULE_PERIOD_INVALID);
+            }
+
+            ConcertScheduleResponse schedule = concertScheduleService.create(
+                    userId, savedConcert.getId(), scheduleInfo.getVenueId(),
+                    scheduleInfo.getStartAt(), scheduleInfo.getEndAt());
+
+            Venue venue = venueRepository.findById(scheduleInfo.getVenueId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.VENUE_NOT_FOUND));
 
             for (ConcertRegisterRequest.RowAssignInfo info : request.getRowAssigns()) {
                 Long gradeId = gradeNameToId.get(info.getGradeName());
@@ -96,24 +90,18 @@ public class ConcertRegisterService {
                 }
 
                 concertSeatGradeService.assign(
-                        savedConcert.getId(),
-                        userId,
-                        info.getRowName(),
-                        gradeId
+                        savedConcert.getId(), userId, info.getRowName(), gradeId
                 );
 
                 List<Seat> seats = seatRepository
                         .findAllByVenueAndRowName(venue, info.getRowName());
 
-                List<Long> seatIds = seats.stream()
-                        .map(Seat::getId).toList();
+                List<Long> seatIds = seats.stream().map(Seat::getId).toList();
 
-                scheduleSeatService.create(
-                        userId, schedule.getId(), gradeId, seatIds
-                );
+                scheduleSeatService.create(userId, schedule.getId(), gradeId, seatIds);
             }
-            return savedConcert.getId();
+        }
 
+        return savedConcert.getId();
     }
-
 }

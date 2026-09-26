@@ -11,7 +11,6 @@ import java.util.List;
 
 @Getter
 public class ConcertRegisterRequest {
-
     @NotBlank(message = "제목은 입력해주세요.")
     private String title;
 
@@ -27,24 +26,31 @@ public class ConcertRegisterRequest {
     @NotNull(message = "판매 마감일은 필수입니다.")
     private LocalDateTime salesEndAt;
 
-    @NotNull(message = "공연장 ID는 필수입니다.")
-    private Long venueId;
-
-    @NotNull(message = "공연 시작일시는 필수입니다.")
-    private LocalDateTime startAt;
-
-    @NotNull(message = "공연 종료일시는 필수입니다.")
-    private LocalDateTime endAt;
-
     private List<ImageInfo> images;
 
-    @NotEmpty(message = "좌석 등급을 1개 이상 등록해주세요.")
+    @NotEmpty(message = "회차를 1개 이상 입력해주세요.")
+    @Valid
+    private List<ScheduleInfo> schedules;
+
+    @NotEmpty(message = "좌석 등급을 1개 이상 입력해주세요.")
     @Valid
     private List<SeatGradeInfo> seatGrades;
 
-    @NotEmpty(message = "구역 배정을 1개 이상 해주세요.")
+    @NotEmpty(message = "구역 배정을 1개 이상 입력해주세요.")
     @Valid
     private List<RowAssignInfo> rowAssigns;
+
+    @Getter
+    public static class ScheduleInfo {
+        @NotNull(message = "공연장 ID는 필수입니다.")
+        private Long venueId;
+
+        @NotNull(message = "공연 시작일시는 필수입니다.")
+        private LocalDateTime startAt;
+
+        @NotNull(message = "공연 종료일시는 필수입니다.")
+        private LocalDateTime endAt;
+    }
 
     @Getter
     public static class SeatGradeInfo {
