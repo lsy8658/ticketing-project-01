@@ -60,6 +60,22 @@ public class ReservationService {
                 ConcertSchedule concertSchedule = concertScheduleRepository.findById(concertScheduleId)
                         .orElseThrow(() -> new CustomException(ErrorCode.CONCERT_SCHEDULE_NOT_FOUND));
 
+                Concert concert = concertSchedule.getConcert();
+
+                if (concert.getStatus() == ConcertStatus.SUSPENDED) {
+                    throw new CustomException(ErrorCode.CONCERT_SUSPENDED);
+                }
+
+                LocalDateTime now = LocalDateTime.now();
+
+                if (now.isBefore(concert.getSalesStartAt()) || now.isAfter(concert.getSalesEndAt())) {
+                    throw new CustomException(ErrorCode.RESERVATION_SALES_NOT_OPEN);
+                }
+
+                if (now.isAfter(concertSchedule.getStartAt())) {
+                    throw new CustomException(ErrorCode.CONCERT_ALREADY_STARTED);
+                }
+
                 Reservation reservation = new Reservation(user, concertSchedule);
                 Reservation savedReservation = reservationRepository.save(reservation);
 

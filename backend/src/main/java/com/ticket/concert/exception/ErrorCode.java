@@ -41,7 +41,10 @@ public enum ErrorCode {
     PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "결제 정보를 찾을 수 없습니다."),
     VENUE_HAS_SCHEDULE(HttpStatus.CONFLICT, "공연 일정이 있는 공연장은 삭제할 수 없습니다."),
     VENUE_HAS_SEATS(HttpStatus.CONFLICT, "좌석이 등록된 공연장은 삭제할 수 없습니다."),
-    RESERVATION_CANCEL_DEADLINE_PASSED(HttpStatus.BAD_REQUEST, "공연 하루 전부터는 예약을 취소할 수 없습니다.");
+    RESERVATION_CANCEL_DEADLINE_PASSED(HttpStatus.BAD_REQUEST, "공연 하루 전부터는 예약을 취소할 수 없습니다."),
+    RESERVATION_SALES_NOT_OPEN(HttpStatus.BAD_REQUEST, "티켓 판매 기간이 아닙니다."),
+    CONCERT_SUSPENDED(HttpStatus.BAD_REQUEST, "판매가 중단된 콘서트입니다."),
+    CONCERT_ALREADY_STARTED(HttpStatus.BAD_REQUEST, "이미 시작된 공연은 예약할 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;
