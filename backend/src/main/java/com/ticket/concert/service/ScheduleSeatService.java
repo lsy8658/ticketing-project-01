@@ -62,7 +62,7 @@ public class ScheduleSeatService {
     }
 
     public List<ScheduleSeatResponse> findAllByConcertSchedule(Long concertScheduleId) {
-        List<ScheduleSeat> scheduleSeats = scheduleSeatRepository.findAllByConcertScheduleId(concertScheduleId);
+        List<ScheduleSeat> scheduleSeats = scheduleSeatRepository.findAllWithSeatAndGradeByConcertScheduleId(concertScheduleId);
         return scheduleSeats.stream()
                 .map(ScheduleSeatResponse::from)
                 .toList();
