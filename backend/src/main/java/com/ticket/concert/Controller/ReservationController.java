@@ -67,4 +67,13 @@ public class ReservationController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{reservationId}/release")
+    public ResponseEntity<Void> release(
+            Authentication authentication,
+            @PathVariable("reservationId") Long reservationId
+    ) {
+        Long userId = (Long) authentication.getPrincipal();
+        reservationService.releaseHolding(reservationId, userId);
+        return ResponseEntity.noContent().build();
+    }
 }

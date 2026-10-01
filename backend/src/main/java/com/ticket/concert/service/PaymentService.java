@@ -12,6 +12,7 @@ import com.ticket.concert.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,7 @@ public class PaymentService {
     private final ReservationRepository reservationRepository;
     private final ReservationSeatRepository reservationSeatRepository;
     private final UserRepository userRepository;
+    private final StringRedisTemplate redisTemplate;
 
     @Transactional
     public void confirm(PaymentRequest request, Long userId) {
@@ -104,7 +106,9 @@ public class PaymentService {
 
 
         for (ReservationSeat reservationSeat : reservationSeats) {
-            reservationSeat.getScheduleSeat().reserve();
+            ScheduleSeat scheduleSeat = reservationSeat.getScheduleSeat();
+            scheduleSeat.reserve();
+            redisTemplate.delete("seat:hold:" + scheduleSeat.getId());
         }
     }
 

@@ -34,6 +34,7 @@ public class ReservationService {
     private final PaymentService paymentService;
     private final PaymentRepository paymentRepository;
     private final TransactionTemplate transactionTemplate;
+    private static final int HOLD_MINUTES = 5;
 
     public Long create(Long userId, Long concertScheduleId, List<Long> scheduleSeatIds) {
 
@@ -105,7 +106,7 @@ public class ReservationService {
                     redisTemplate.opsForValue().set(
                             "seat:hold:" + scheduleSeat.getId(),
                             "HOLD",
-                            2,
+                            HOLD_MINUTES,
                             TimeUnit.MINUTES
                     );
                 }
@@ -154,19 +155,46 @@ public class ReservationService {
 
     @Transactional
     public void release(Long scheduleSeatId) {
-
         ScheduleSeat scheduleSeat = scheduleSeatRepository.findById(scheduleSeatId)
                 .orElseThrow(() -> new CustomException(ErrorCode.SCHEDULE_SEAT_NOT_FOUND));
 
+        if (scheduleSeat.getStatus() != SeatStatus.HOLDING) {
+            return;
+        }
+
         scheduleSeat.release();
 
-        reservationSeatRepository.findByScheduleSeat(scheduleSeat)
-                .ifPresent(reservationSeat -> {
-                    Reservation reservation = reservationSeat.getReservation();
-                    if (reservation.getStatus() == ReservationStatus.RESERVED) {
-                        reservation.cancel();
-                    }
-                });
+        reservationSeatRepository
+                .findByScheduleSeatAndReservation_Status(scheduleSeat, ReservationStatus.RESERVED)
+                .ifPresent(reservationSeat -> reservationSeat.getReservation().cancel());
+    }
+
+    @Transactional
+    public void releaseHolding(Long reservationId, Long userId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
+
+        if (!reservation.getUser().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.RESERVATION_FORBIDDEN);
+        }
+
+        if (reservation.getStatus() == ReservationStatus.CANCELLED
+                || paymentRepository.existsByReservation(reservation)) {
+            return;
+        }
+
+        List<ReservationSeat> reservationSeats =
+                reservationSeatRepository.findAllByReservation(reservation);
+
+        for (ReservationSeat reservationSeat : reservationSeats) {
+            ScheduleSeat scheduleSeat = reservationSeat.getScheduleSeat();
+            if (scheduleSeat.getStatus() == SeatStatus.HOLDING) {
+                scheduleSeat.release();
+                redisTemplate.delete("seat:hold:" + scheduleSeat.getId());
+            }
+        }
+
+        reservation.cancel();
     }
 
     @Transactional
