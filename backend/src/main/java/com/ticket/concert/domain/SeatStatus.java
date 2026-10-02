@@ -7,7 +7,7 @@ public enum SeatStatus {
 }
 
 /*
-    AVAILABLE : 예매 가능
-    HOLDING : 결제 진행 중 임시 점유(5분)
-    RESERVED : 결제 완료
+   AVAILABLE : 예매 가능
+   HOLDING : 결제 진행 중 임시 점유(2분)
+   RESERVED : 결제 완료
 */

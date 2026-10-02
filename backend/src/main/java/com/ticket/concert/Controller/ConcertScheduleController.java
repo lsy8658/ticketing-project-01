@@ -42,7 +42,7 @@ public class ConcertScheduleController {
     public ResponseEntity<ConcertScheduleResponse> updateConcertSchedule(
             Authentication authentication,
             @PathVariable("scheduleId") Long scheduleId,
-            @RequestBody ConcertScheduleUpdateRequest request
+            @Valid @RequestBody ConcertScheduleUpdateRequest request
     ) {
         Long userId = (Long) authentication.getPrincipal();
 

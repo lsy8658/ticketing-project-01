@@ -12,3 +12,10 @@ export type ReservationDetail = {
   }[];
   totalAmount: number;
 };
+
+export type ReservationListItem = {
+  id: number;
+  concertScheduleId: number;
+  status: "RESERVED" | "CANCELLED";
+  reservedAt: string;
+};

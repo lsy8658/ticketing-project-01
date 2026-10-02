@@ -10,7 +10,7 @@ import com.ticket.concert.repository.ConcertRepository;
 import com.ticket.concert.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 
@@ -20,14 +20,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final ConcertRepository concertRepository;
     private final ConcertService concertService;
+    private final TransactionTemplate transactionTemplate;
 
     public UserResponse findById(Long userId) {
-         User user = userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-         return new UserResponse(user.getId(), user.getEmail(), user.getNickname(), user.getRole());
+        return new UserResponse(user.getId(), user.getEmail(), user.getNickname(), user.getRole());
     }
 
-    @Transactional
     public void updateRole(Long userId, UserRole role) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -38,7 +38,11 @@ public class UserService {
                 concertService.delete(userId, concert.getId());
             }
         }
-        user.changeRole(role);
+
+        transactionTemplate.executeWithoutResult(status ->
+                userRepository.findById(userId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND))
+                        .changeRole(role));
     }
 
     public List<UserResponse> findAll() {

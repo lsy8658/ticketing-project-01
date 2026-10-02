@@ -4,9 +4,11 @@ import { axiosClient } from "./axiosClient";
 export const useAxiosQuery = <T>({
   url,
   queryKey,
+  enabled = true,
 }: {
   url: string;
   queryKey: string[];
+  enabled?: boolean;
 }) => {
   return useQuery({
     queryKey,
@@ -14,5 +16,6 @@ export const useAxiosQuery = <T>({
       const res = await axiosClient.get<T>(url);
       return res.data;
     },
+    enabled,
   });
 };

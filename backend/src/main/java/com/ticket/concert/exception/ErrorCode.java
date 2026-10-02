@@ -44,7 +44,8 @@ public enum ErrorCode {
     RESERVATION_CANCEL_DEADLINE_PASSED(HttpStatus.BAD_REQUEST, "공연 하루 전부터는 예약을 취소할 수 없습니다."),
     RESERVATION_SALES_NOT_OPEN(HttpStatus.BAD_REQUEST, "티켓 판매 기간이 아닙니다."),
     CONCERT_SUSPENDED(HttpStatus.BAD_REQUEST, "판매가 중단된 콘서트입니다."),
-    CONCERT_ALREADY_STARTED(HttpStatus.BAD_REQUEST, "이미 시작된 공연은 예약할 수 없습니다.");
+    CONCERT_ALREADY_STARTED(HttpStatus.BAD_REQUEST, "이미 시작된 공연은 예약할 수 없습니다."),
+    PAYMENT_CONFIRM_FAILED(HttpStatus.BAD_REQUEST, "결제 승인에 실패했습니다.");
 
     private final HttpStatus status;
     private final String message;

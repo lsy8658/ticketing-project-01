@@ -7,11 +7,15 @@ import { login } from "@/lib/api/auth";
 import { FormInput } from "@/components/FormInput/FormInput";
 import { Button } from "@/components/Button/Button";
 import styles from "./page.module.css";
+import { useAuthStore } from "@/lib/store/authStore";
+import { Spinner } from "@/components/Spinner/Spinner";
 
 const LoginPage = () => {
   const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const setUser = useAuthStore((state) => state.setUser);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -19,9 +23,18 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
-      const token = await login(form);
-      localStorage.setItem("token", token);
+      const response = await login(form);
+      localStorage.setItem("token", response.token);
+
+      setUser({
+        id: response.userId,
+        email: response.email,
+        nickname: response.nickname,
+        role: response.role,
+      });
+
       router.push("/");
     } catch (err) {
       if (isAxiosError(err) && typeof err.response?.data === "string") {
@@ -29,6 +42,8 @@ const LoginPage = () => {
       } else {
         setError("로그인에 실패했습니다.");
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -51,7 +66,9 @@ const LoginPage = () => {
           onChange={handleChange}
         />
         {error && <p className={styles.error}>{error}</p>}
-        <Button type="submit">로그인</Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? <Spinner /> : "로그인"}
+        </Button>
         <Link href="/signup" className={styles.link}>
           회원가입
         </Link>

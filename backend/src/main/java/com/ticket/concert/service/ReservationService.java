@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -34,7 +35,7 @@ public class ReservationService {
     private final PaymentService paymentService;
     private final PaymentRepository paymentRepository;
     private final TransactionTemplate transactionTemplate;
-    private static final int HOLD_MINUTES = 5;
+    private static final int HOLD_MINUTES = 2;
 
     public Long create(Long userId, Long concertScheduleId, List<Long> scheduleSeatIds) {
 
@@ -48,11 +49,16 @@ public class ReservationService {
                 .map(id -> redissonClient.getLock("seat:" + id))
                 .toList();
 
-        log.info("락 획득 시도");
-        locks.forEach(RLock::lock);
-        log.info("락 획득 완료");
+        List<RLock> acquiredLocks = new ArrayList<>();
 
         try {
+            log.info("락 획득 시도");
+            for (RLock lock : locks) {
+                lock.lock();
+                acquiredLocks.add(lock);
+            }
+            log.info("락 획득 완료");
+
             return transactionTemplate.execute(status -> {
 
                 User user = userRepository.findById(userId)
@@ -75,6 +81,13 @@ public class ReservationService {
 
                 if (now.isAfter(concertSchedule.getStartAt())) {
                     throw new CustomException(ErrorCode.CONCERT_ALREADY_STARTED);
+                }
+
+                long alreadyReserved = reservationSeatRepository.countByUserAndSchedule(
+                        userId, concertScheduleId, ReservationStatus.RESERVED);
+
+                if (alreadyReserved + scheduleSeatIds.size() > 4) {
+                    throw new CustomException(ErrorCode.RESERVATION_SEAT_LIMIT_EXCEEDED);
                 }
 
                 Reservation reservation = new Reservation(user, concertSchedule);
@@ -101,7 +114,6 @@ public class ReservationService {
                     scheduleSeat.hold();
 
                     log.info("Redis 저장 : {}", scheduleSeat.getId());
-                    log.info("Connection Factory : {}", redisTemplate.getConnectionFactory());
 
                     redisTemplate.opsForValue().set(
                             "seat:hold:" + scheduleSeat.getId(),
@@ -122,11 +134,14 @@ public class ReservationService {
             });
 
         } finally {
-            locks.forEach(RLock::unlock);
+            for (RLock lock : acquiredLocks) {
+                if (lock.isHeldByCurrentThread()) {
+                    lock.unlock();
+                }
+            }
             log.info("락 해제 완료");
         }
     }
-
     @Transactional(readOnly = true)
     public ReservationDetailResponse getReservationDetail(Long reservationId, Long userId) {
         Reservation reservation = reservationRepository.findById(reservationId)

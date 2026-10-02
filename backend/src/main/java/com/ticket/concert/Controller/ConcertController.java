@@ -39,8 +39,11 @@ public class ConcertController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ConcertResponse>> getConcerts () {
-        List<ConcertResponse> concerts = concertService.findAll();
+    public ResponseEntity<List<ConcertResponse>> getConcerts (
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "50") int size
+    ) {
+        List<ConcertResponse> concerts = concertService.findAll(page, size);
         return ResponseEntity.ok(concerts);
     }
 

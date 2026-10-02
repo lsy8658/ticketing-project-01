@@ -8,6 +8,10 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(indexes = @Index(
+        name = "idx_schedule_seat_status_hold_at",
+        columnList = "status, hold_at"
+))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ScheduleSeat {

@@ -1,0 +1,117 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.error {
+  color: var(--color-accent);
+  font-size: 14px;
+}
+
+.addressButton {
+  width: fit-content;
+  padding: 10px 16px;
+  font-size: 14px;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.addressButton:hover {
+  background-color: var(--color-background);
+}
+
+.seatSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+}
+
+.seatSection h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.seatList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.seatList li {
+  padding: 7px 11px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--color-text);
+}
+
+.rowSet {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: var(--color-surface);
+}
+
+.rowSet > * {
+  min-width: 0;
+}
+
+/* FormInput 내부 input */
+.rowSet :global(input) {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* 각 FormInput 영역 */
+.rowSet > *:not(button) {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.rowSet button {
+  flex: 0 0 auto;
+  width: fit-content;
+  min-width: 56px;
+  height: 40px;
+  padding: 0 14px;
+  box-sizing: border-box;
+  color: var(--color-text);
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.rowSet button:hover {
+  background-color: var(--color-background);
+}

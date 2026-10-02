@@ -38,4 +38,12 @@
   .container {
     padding: 24px 16px;
   }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .total {
+    font-size: 18px;
+  }
 }

@@ -1,4 +1,4 @@
-import { LoginRequest, SignupRequest } from "@/types/auth";
+import { LoginRequest, LoginResponse, SignupRequest } from "@/types/auth";
 import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -8,7 +8,7 @@ export const signup = async (data: SignupRequest): Promise<number> => {
   return res.data;
 };
 
-export const login = async (data: LoginRequest): Promise<string> => {
+export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   const res = await axios.post(`${API_URL}/api/auth/login`, data);
   return res.data;
 };

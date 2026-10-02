@@ -4,6 +4,7 @@ import { ConfirmPaymentRequest } from "@/types/payment";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import styles from "./page.module.css";
+import { Button } from "@/components/Button/Button";
 
 const PaymentSuccessPage = () => {
   const searchParams = useSearchParams();
@@ -31,7 +32,7 @@ const PaymentSuccessPage = () => {
   return (
     <main className={styles.container}>
       <h1 className={styles.title}>예매가 완료되었습니다!</h1>
-      <button onClick={() => router.push("/mypage")}>마이페이지로 이동</button>
+      <Button onClick={() => router.push("/mypage")}>마이페이지로 이동</Button>
     </main>
   );
 };

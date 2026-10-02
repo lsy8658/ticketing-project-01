@@ -1,6 +1,7 @@
 import { getScheduleSeats } from "@/lib/api/scheduleSeats";
 import styles from "./page.module.css";
 import { SeatGrid } from "@/components/SeatGrid/SeatGrid";
+import { Spinner } from "@/components/Spinner/Spinner";
 
 const SeatSelectionPage = async ({
   params,
@@ -12,8 +13,14 @@ const SeatSelectionPage = async ({
 
   return (
     <main className={styles.container}>
-      <h1 className={styles.title}>좌석 선택</h1>
-      <SeatGrid seats={seats} concertScheduleId={Number(scheduleId)} />
+      {seats.length > 0 ? (
+        <>
+          <h1 className={styles.title}>좌석 선택</h1>
+          <SeatGrid seats={seats} concertScheduleId={Number(scheduleId)} />
+        </>
+      ) : (
+        <Spinner />
+      )}
     </main>
   );
 };

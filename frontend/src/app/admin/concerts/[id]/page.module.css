@@ -1,0 +1,75 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.mainImage {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.previewImage {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.subImageGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.error {
+  color: var(--color-accent);
+  font-size: 14px;
+}
+
+.textarea {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 16px;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.textarea:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(255, 46, 136, 0.15);
+}
+.imageItem {
+  position: relative;
+  width: fit-content;
+}
+
+.removeButton {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: var(--color-text);
+  font-size: 12px;
+  line-height: 1;
+  border: none;
+  cursor: pointer;
+}

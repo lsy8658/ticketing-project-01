@@ -10,6 +10,8 @@ import { Button } from "@/components/Button/Button";
 import Link from "next/link";
 import { isValidEmail, isValidPassword } from "@/lib/validation";
 import { ERROR_MESSAGES } from "@/lib/errorMessage";
+import { Spinner } from "@/components/Spinner/Spinner";
+import { toast } from "sonner";
 
 const SignupPage = () => {
   const router = useRouter();
@@ -20,6 +22,7 @@ const SignupPage = () => {
     nickname: "",
   });
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -27,24 +30,29 @@ const SignupPage = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     if (!isValidEmail(form.email)) {
       setError(ERROR_MESSAGES.INVALID_EMAIL);
+      setIsLoading(false);
       return;
     }
 
     if (!isValidPassword(form.password)) {
       setError(ERROR_MESSAGES.INVALID_PASSWORD);
+      setIsLoading(false);
       return;
     }
 
     if (form.password !== form.confirmPassword) {
       setError(ERROR_MESSAGES.PASSWORD_MISMATCH);
+      setIsLoading(false);
       return;
     }
 
     try {
       await signup(form);
+      toast.success("회원가입이 완료되었습니다!");
       router.push("/login");
     } catch (err) {
       if (isAxiosError(err) && typeof err.response?.data === "string") {
@@ -52,6 +60,8 @@ const SignupPage = () => {
       } else {
         setError(ERROR_MESSAGES.SIGNUP_FAILED);
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -88,7 +98,9 @@ const SignupPage = () => {
           onChange={handleChange}
         />
         {error && <p className={styles.error}>{error}</p>}
-        <Button type="submit">회원가입</Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? <Spinner /> : "회원가입"}
+        </Button>
         <Link href={"/login"} className={styles.link}>
           로그인
         </Link>

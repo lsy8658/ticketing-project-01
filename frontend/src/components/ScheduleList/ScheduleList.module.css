@@ -1,27 +1,82 @@
 .scheduleList {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin: 0 20px;
+  gap: 10px;
+}
+
+.scheduleItems {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 35vh;
+  max-height: 150px;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .scheduleItem {
-  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 12px;
+  padding: 16px 18px;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: 12px;
   color: var(--color-text);
-  font-size: 15px;
+  font-size: 14px;
   cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.scheduleItem:hover {
+  border-color: rgba(255, 46, 136, 0.4);
 }
 
 .selected {
   border-color: var(--color-accent);
-  background-color: rgba(255, 46, 136, 0.1);
+  background-color: rgba(255, 46, 136, 0.08);
+}
+
+.dateText {
+  font-weight: 600;
+}
+
+.venueText {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  text-align: right;
+}
+
+.confirmButton {
+  width: 100%;
+  margin-top: 6px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-bg);
+  background-color: var(--color-accent);
+  border-radius: 10px;
 }
 
 @media (max-width: 480px) {
+  .scheduleItems {
+    max-height: 45vh;
+  }
+
   .scheduleItem {
+    padding: 14px 16px;
+    font-size: 13px;
+  }
+
+  .venueText {
+    font-size: 12px;
+  }
+
+  .confirmButton {
     padding: 12px;
     font-size: 14px;
   }

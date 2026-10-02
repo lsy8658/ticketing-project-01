@@ -11,3 +11,10 @@ export type ConcertSchedule = {
   };
   startAt: string;
 };
+
+export type ConcertScheduleCreateRequest = {
+  concertId: number;
+  venueId: number;
+  startAt: string;
+  endAt: string;
+};

@@ -10,14 +10,18 @@ export type SeatGradeCreateResponse = {
   price: number;
 };
 
-export type SeatCreateRequest = {
-  venueId: number;
-  seatGradeId: number;
-  seatNumber: string;
-};
-
 export type SeatResponse = {
   id: number;
   seatNumber: string;
-  seatGradeId: number;
+  rowName: string;
+  priority: number;
+};
+
+export type SeatBulkCreateRequest = {
+  venueId: number;
+  rows: {
+    rowName: string;
+    seatCount: number;
+    priority: number;
+  }[];
 };

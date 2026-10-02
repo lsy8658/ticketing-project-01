@@ -1,5 +1,6 @@
-import { Concert } from "@/types/concert";
+import { Concert, ConcertRegisterRequest } from "@/types/concert";
 import { fetchClient } from "../fetchClient";
+import { axiosClient } from "../axiosClient";
 
 export const getConcerts = async (): Promise<Concert[]> => {
   const data = await fetchClient<Concert[]>("concerts", {
@@ -15,4 +16,16 @@ export const getConcert = async (id: number): Promise<Concert | null> => {
   });
 
   return data;
+};
+
+export const getMyConcerts = async (): Promise<Concert[]> => {
+  const res = await axiosClient.get("/concerts/my");
+  return res.data;
+};
+
+export const registerConcert = async (
+  data: ConcertRegisterRequest,
+): Promise<number> => {
+  const res = await axiosClient.post("/concerts/register", data);
+  return res.data;
 };
