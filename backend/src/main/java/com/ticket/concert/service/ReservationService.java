@@ -273,9 +273,11 @@ public class ReservationService {
                         )
                 ));
 
-        Set<Long> paidReservationIds = new HashSet<>(
-                paymentRepository.findReservationIdsByUserAndStatus(user, PaymentStatus.PAID)
-        );
+        Set<Long> paidReservationIds = paymentRepository
+                .findAllByReservation_User(user).stream()
+                .filter(payment -> payment.getStatus() == PaymentStatus.PAID)
+                .map(payment -> payment.getReservation().getId())
+                .collect(Collectors.toSet());
 
         return reservations.stream()
                 .map(reservation -> ReservationResponse.from(
@@ -284,5 +286,6 @@ public class ReservationService {
                         paidReservationIds.contains(reservation.getId())
                 ))
                 .toList();
+
     }
 }
