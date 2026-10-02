@@ -28,4 +28,12 @@ public interface ReservationSeatRepository extends JpaRepository<ReservationSeat
             @Param("concertScheduleId") Long concertScheduleId,
             @Param("status") ReservationStatus status
     );
+    @Query("SELECT reservationSeat FROM ReservationSeat reservationSeat "
+            + "JOIN FETCH reservationSeat.scheduleSeat scheduleSeat "
+            + "JOIN FETCH scheduleSeat.seat "
+            + "JOIN FETCH scheduleSeat.seatGrade "
+            + "WHERE reservationSeat.reservation IN :reservations")
+    List<ReservationSeat> findAllWithSeatByReservationIn(
+            @Param("reservations") List<Reservation> reservations
+    );
 }

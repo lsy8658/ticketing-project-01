@@ -16,9 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -249,8 +249,40 @@ public class ReservationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        return reservationRepository.findAllByUser(user).stream()
-                .map(ReservationResponse::from)
+        List<Reservation> reservations =
+                reservationRepository.findAllWithScheduleByUser(user);
+
+        if (reservations.isEmpty()) {
+            return List.of();
+        }
+
+        List<ReservationSeat> reservationSeats =
+                reservationSeatRepository.findAllWithSeatByReservationIn(reservations);
+
+
+        Map<Long, List<ReservationDetailResponse.SeatInfo>> seatsByReservation =
+                reservationSeats.stream().collect(Collectors.groupingBy(
+                        rs -> rs.getReservation().getId(),
+                        Collectors.mapping(
+                                rs -> new ReservationDetailResponse.SeatInfo(
+                                        rs.getScheduleSeat().getSeat().getSeatNumber(),
+                                        rs.getScheduleSeat().getSeatGrade().getName(),
+                                        rs.getScheduleSeat().getSeatGrade().getPrice()
+                                ),
+                                Collectors.toList()
+                        )
+                ));
+
+        Set<Long> paidReservationIds = new HashSet<>(
+                paymentRepository.findReservationIdsByUserAndStatus(user, PaymentStatus.PAID)
+        );
+
+        return reservations.stream()
+                .map(reservation -> ReservationResponse.from(
+                        reservation,
+                        seatsByReservation.getOrDefault(reservation.getId(), List.of()),
+                        paidReservationIds.contains(reservation.getId())
+                ))
                 .toList();
     }
 }
