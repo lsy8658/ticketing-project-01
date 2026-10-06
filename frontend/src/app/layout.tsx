@@ -6,7 +6,7 @@ import { Header } from "@/components/Header/Header";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "티켓콘 | 콘서트 예매",
+  title: "티켓몬스터 | 콘서트 예매",
   description: "실시간 좌석 예매, 콘서트 티켓 예매 플랫폼",
 };
 

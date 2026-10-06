@@ -13,9 +13,21 @@ export type ReservationDetail = {
   totalAmount: number;
 };
 
+export type ReservationSeatInfo = {
+  seatNumber: string;
+  seatGradeName: string;
+  price: number;
+};
+
 export type ReservationListItem = {
   id: number;
   concertScheduleId: number;
   status: "RESERVED" | "CANCELLED";
   reservedAt: string;
+  concertTitle: string;
+  venueName: string;
+  scheduleStartAt: string;
+  seats: ReservationSeatInfo[];
+  totalAmount: number;
+  paid: boolean;
 };
