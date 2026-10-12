@@ -176,7 +176,10 @@ public class ReservationService {
         if (scheduleSeat.getStatus() != SeatStatus.HOLDING) {
             return;
         }
-
+        if (scheduleSeat.getHoldAt() == null || scheduleSeat.getHoldAt()
+                .isAfter(LocalDateTime.now().minusMinutes(HOLD_MINUTES))) {
+            return;
+        }
         scheduleSeat.release();
 
         reservationSeatRepository
