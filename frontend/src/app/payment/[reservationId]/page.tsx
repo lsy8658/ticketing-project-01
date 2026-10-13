@@ -14,6 +14,7 @@ const PaymentPage = () => {
     null,
   );
   const isPaying = useRef(false);
+  const releaseTimer = useRef<number | undefined>(undefined);
   const { requestPayment } = useTossPayment();
   const customerKey = `user-${reservationId}`;
 
@@ -32,6 +33,8 @@ const PaymentPage = () => {
   }, [reservationId]);
 
   useEffect(() => {
+    window.clearTimeout(releaseTimer.current);
+
     const release = () => {
       if (isPaying.current) return;
       const token = localStorage.getItem("token");
@@ -48,6 +51,7 @@ const PaymentPage = () => {
     window.addEventListener("pagehide", release);
     return () => {
       window.removeEventListener("pagehide", release);
+      releaseTimer.current = window.setTimeout(release, 300);
     };
   }, [reservationId]);
 
