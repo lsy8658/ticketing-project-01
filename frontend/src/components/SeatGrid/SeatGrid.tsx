@@ -8,6 +8,7 @@ import { createReservation } from "@/lib/api/reservations";
 import { Button } from "@/components/Button/Button";
 import { toast } from "sonner";
 import styles from "./SeatGrid.module.css";
+import { Spinner } from "../Spinner/Spinner";
 
 export const SeatGrid = ({
   seats,
@@ -38,7 +39,8 @@ export const SeatGrid = ({
   };
 
   const handleReserve = async () => {
-    if (selectedIds.length === 0) return;
+    if (selectedIds.length === 0 || isReserving) return;
+    setIsReserving(true);
 
     try {
       const reservationId = await createReservation({
@@ -48,8 +50,11 @@ export const SeatGrid = ({
 
       if (reservationId) {
         router.push(`/payment/${reservationId}`);
+      } else {
+        setIsReserving(false);
       }
     } catch (err) {
+      setIsReserving(false);
       if (isAxiosError(err) && typeof err.response?.data === "string") {
         toast.error(err.response.data);
       } else {
@@ -91,8 +96,11 @@ export const SeatGrid = ({
           ))}
       </div>
       <div className={styles.buttonWrap}>
-        <Button onClick={handleReserve} disabled={selectedIds.length === 0}>
-          예매하기
+        <Button
+          onClick={handleReserve}
+          disabled={selectedIds.length === 0 || isReserving}
+        >
+          {isReserving ? <Spinner /> : "예매하기"}
         </Button>
       </div>
     </div>

@@ -12,6 +12,29 @@
   margin-bottom: 24px;
 }
 
+.button {
+  margin-top: 24px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-bg);
+  background-color: var(--color-accent);
+  border-radius: var(--radius-sm);
+}
+.message {
+  font-size: 15px;
+  color: var(--color-text-muted);
+}
+
+.button {
+  margin-top: 24px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-bg);
+  background-color: var(--color-accent);
+  border-radius: var(--radius-sm);
+}
 @media (max-width: 480px) {
   .container {
     margin: 60px auto;

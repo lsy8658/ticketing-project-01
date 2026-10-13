@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { axiosClient } from "@/lib/axiosClient";
 import { ReservationDetail } from "@/types/reservation";
@@ -13,19 +13,59 @@ const PaymentPage = () => {
   const [reservation, setReservation] = useState<ReservationDetail | null>(
     null,
   );
+  const isPaying = useRef(false);
   const { requestPayment } = useTossPayment();
   const customerKey = `user-${reservationId}`;
+
   useEffect(() => {
     const fetchReservation = async () => {
-      const res = await axiosClient.get<ReservationDetail>(
-        `/reservations/${reservationId}`,
-      );
-      setReservation(res.data);
+      try {
+        const res = await axiosClient.get<ReservationDetail>(
+          `/reservations/${reservationId}`,
+        );
+        setReservation(res.data);
+      } catch {
+        setReservation(null);
+      }
     };
     fetchReservation();
   }, [reservationId]);
 
+  useEffect(() => {
+    const release = () => {
+      if (isPaying.current) return;
+      const token = localStorage.getItem("token");
+      fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/reservations/${reservationId}/release`,
+        {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}` },
+          keepalive: true,
+        },
+      ).catch(() => {});
+    };
+
+    window.addEventListener("pagehide", release);
+    return () => {
+      window.removeEventListener("pagehide", release);
+    };
+  }, [reservationId]);
+
   if (!reservation) return null;
+
+  const handlePay = async () => {
+    isPaying.current = true;
+    try {
+      await requestPayment({
+        reservationId: Number(reservationId),
+        orderName: reservation.seats[0]?.seatNumber ?? "콘서트 예매",
+        amount: reservation.totalAmount,
+        customerKey,
+      });
+    } catch {
+      isPaying.current = false;
+    }
+  };
 
   return (
     <main className={styles.container}>
@@ -38,18 +78,7 @@ const PaymentPage = () => {
         ))}
       </ul>
       <p className={styles.total}>총 금액: {reservation.totalAmount}원</p>
-      <Button
-        onClick={() =>
-          requestPayment({
-            reservationId: Number(reservationId),
-            orderName: `${reservation.seats[0].seatNumber}`,
-            amount: reservation.totalAmount,
-            customerKey,
-          })
-        }
-      >
-        결제하기
-      </Button>
+      <Button onClick={handlePay}>결제하기</Button>
     </main>
   );
 };

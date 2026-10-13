@@ -1,10 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import styles from "./page.module.css";
+import { Spinner } from "@/components/Spinner/Spinner";
 
-const PaymentFailPage = () => {
+const PaymentFailContent = () => {
   const searchParams = useSearchParams();
   const message = searchParams.get("message") ?? "결제에 실패했습니다.";
 
@@ -16,6 +18,14 @@ const PaymentFailPage = () => {
         메인으로 돌아가기
       </Link>
     </main>
+  );
+};
+
+const PaymentFailPage = () => {
+  return (
+    <Suspense fallback={<Spinner />}>
+      <PaymentFailContent />
+    </Suspense>
   );
 };
 

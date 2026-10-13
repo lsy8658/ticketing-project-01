@@ -4,6 +4,7 @@ import { getConcertSchedules } from "@/lib/api/concertSchedules";
 import { ScheduleList } from "@/components/ScheduleList/ScheduleList";
 import styles from "./page.module.css";
 import { BackButton } from "@/components/BackButton/BackButton";
+import { parseKst } from "@/lib/date";
 
 const ConcertDetailPage = async ({
   params,
@@ -20,10 +21,10 @@ const ConcertDetailPage = async ({
   }
 
   const now = new Date();
-  const isSalesOpen =
-    now >= new Date(concert.salesStartAt) &&
-    now <= new Date(concert.salesEndAt);
-  const isOngoing = new Date(concert.salesStartAt) <= new Date();
+  const salesStart = parseKst(concert.salesStartAt);
+  const salesEnd = parseKst(concert.salesEndAt);
+  const isSalesOpen = now >= salesStart && now <= salesEnd;
+  const isOngoing = salesStart <= now;
 
   return (
     <main>
@@ -51,6 +52,21 @@ const ConcertDetailPage = async ({
 
       <div className={styles.container}>
         <p className={styles.description}>{concert.description}</p>
+        {concert.images.length > 0 && (
+          <div className={styles.imageList}>
+            {concert.images.map((img) => (
+              <Image
+                key={img.publicId}
+                src={img.url}
+                alt={`${concert.title} 상세 이미지`}
+                width={0}
+                height={0}
+                sizes="100vw"
+                className={styles.detailImage}
+              />
+            ))}
+          </div>
+        )}
         <ScheduleList
           schedules={schedules}
           concertId={concertId}

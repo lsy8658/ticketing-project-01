@@ -4,27 +4,15 @@ import { Button } from "@/components/Button/Button";
 import { FormInput } from "@/components/FormInput/FormInput";
 import { useAxiosQuery } from "@/lib/useAxiosQuery";
 import { useAxiosMutation } from "@/lib/useAxiosMutation";
-import {
-  Concert,
-  ConcertSeatGradeAssignRequest,
-  ConcertSeatGradeStatus,
-  ConcertUpdateRequest,
-} from "@/types/concert";
+import { Concert, ConcertUpdateRequest } from "@/types/concert";
 import { ImageInfo } from "@/types/image";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { isAxiosError } from "axios";
 import styles from "./page.module.css";
-import { SeatGradeCreateResponse } from "@/types/seat";
-import { useQueryClient } from "@tanstack/react-query";
 import { Spinner } from "@/components/Spinner/Spinner";
 import { toast } from "sonner";
 import { BackButton } from "@/components/BackButton/BackButton";
-import { VenueResponse } from "@/types/venue";
-import {
-  ConcertSchedule,
-  ConcertScheduleCreateRequest,
-} from "@/types/concertSchedule";
 
 const AdminConcertDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -40,14 +28,7 @@ const AdminConcertDetailPage = () => {
   const [mainImagePreview, setMainImagePreview] = useState("");
   const [subImageFiles, setSubImageFiles] = useState<File[]>([]);
   const [subImagePreviews, setSubImagePreviews] = useState<string[]>([]);
-  const [scheduleForm, setScheduleForm] = useState({
-    venueId: "",
-    startAt: "",
-    endAt: "",
-  });
-
   const [error, setError] = useState("");
-  const queryClient = useQueryClient();
 
   const { mutateAsync: uploadImage, isPending: isUploadPending } =
     useAxiosMutation<ImageInfo[], FormData>({
@@ -62,59 +43,6 @@ const AdminConcertDetailPage = () => {
     url: `/concerts/${id}`,
     type: "patch",
   });
-
-  const { data: gradeStatus = [] } = useAxiosQuery<ConcertSeatGradeStatus[]>({
-    url: `/concert-seat-grades/${id}/status`,
-    queryKey: ["concertSeatGradeStatus", id],
-  });
-
-  const { data: seatGrades = [] } = useAxiosQuery<SeatGradeCreateResponse[]>({
-    url: `/seat-grades/concerts/${id}`,
-    queryKey: ["seatGrades", id],
-  });
-  const { mutate: assignGrade } = useAxiosMutation<
-    void,
-    ConcertSeatGradeAssignRequest
-  >({
-    url: `/concert-seat-grades/${id}`,
-    type: "post",
-  });
-  const { mutate: addSchedule, isPending: isSchedulePending } =
-    useAxiosMutation<ConcertSchedule, ConcertScheduleCreateRequest>({
-      url: "/concert-schedules",
-      type: "post",
-    });
-
-  const handleAddSchedule = () => {
-    addSchedule(
-      {
-        concertId: Number(id),
-        venueId: Number(scheduleForm.venueId),
-        startAt: scheduleForm.startAt,
-        endAt: scheduleForm.endAt,
-      },
-      {
-        onSuccess: () => {
-          setScheduleForm({ venueId: "", startAt: "", endAt: "" });
-          queryClient.invalidateQueries({ queryKey: ["concertSchedules", id] });
-        },
-      },
-    );
-  };
-  const handleAssignGrade = (rowName: string, seatGradeId: number) => {
-    assignGrade(
-      { rowName, seatGradeId },
-      {
-        onSuccess: () => {
-          queryClient.invalidateQueries({
-            queryKey: ["concertSeatGradeStatus", id],
-          });
-          toast.success(`${rowName}구역 등급을 배정했습니다.`);
-        },
-        onError: () => toast.error("등급 배정에 실패했습니다."),
-      },
-    );
-  };
 
   const startEditing = () => {
     if (!concert) return;
@@ -152,6 +80,7 @@ const AdminConcertDetailPage = () => {
       ...newFiles.map((f) => URL.createObjectURL(f)),
     ]);
   };
+
   const handleRemoveMainImage = () => {
     setMainImageFile(null);
     setMainImagePreview("");
@@ -161,6 +90,7 @@ const AdminConcertDetailPage = () => {
     setSubImageFiles((prev) => prev.filter((_, i) => i !== index));
     setSubImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
@@ -212,7 +142,7 @@ const AdminConcertDetailPage = () => {
     }
   };
 
-  if (isLoading) return <Spinner />;
+  if (isLoading) return <Spinner positionCenter />;
   if (!concert) return <p>콘서트를 찾을 수 없습니다.</p>;
 
   return (
@@ -314,31 +244,6 @@ const AdminConcertDetailPage = () => {
             취소
           </Button>
         </form>
-      )}
-
-      {gradeStatus.length > 0 && (
-        <div className={styles.gradeSection}>
-          <h3>구역별 등급</h3>
-          {gradeStatus.map((row) => (
-            <div key={row.rowName}>
-              <span>
-                {row.rowName}구역: {row.seatGradeName ?? "등급 설정 필요"}
-              </span>
-              <select
-                onChange={(e) =>
-                  handleAssignGrade(row.rowName, Number(e.target.value))
-                }
-              >
-                <option value="">등급 선택</option>
-                {seatGrades.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ))}
-        </div>
       )}
     </AdminLayout>
   );

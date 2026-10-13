@@ -1,20 +1,21 @@
 import styles from "./page.module.css";
 import { getConcerts } from "@/lib/api/concerts";
 import { ConcertCard } from "@/components/ConcertCard/ConcertCard";
+import { parseKst } from "@/lib/date";
 
 const HomePage = async () => {
   const concerts = await getConcerts();
   const now = new Date();
 
   const visibleConcerts = concerts.filter(
-    (concert) => now <= new Date(concert.salesEndAt),
+    (concert) => now <= parseKst(concert.salesEndAt),
   );
 
   const ongoing = visibleConcerts.filter(
-    (concert) => new Date(concert.salesStartAt) <= now,
+    (concert) => parseKst(concert.salesStartAt) <= now,
   );
   const upcoming = visibleConcerts.filter(
-    (concert) => new Date(concert.salesStartAt) > now,
+    (concert) => parseKst(concert.salesStartAt) > now,
   );
 
   const featured = ongoing[0] ?? upcoming[0] ?? null;

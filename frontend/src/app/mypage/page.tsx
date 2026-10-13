@@ -66,12 +66,6 @@ const MyPage = () => {
               >
                 내 예약 보기 <span>›</span>
               </button>
-              <button
-                className={styles.linkButton}
-                onClick={() => router.push("/mypage/payments")}
-              >
-                결제 내역 보기 <span>›</span>
-              </button>
             </div>
 
             {user.role === "USER" && !isRoleRequestLoading && (

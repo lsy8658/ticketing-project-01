@@ -7,9 +7,25 @@ import { Spinner } from "@/components/Spinner/Spinner";
 import styles from "./page.module.css";
 import { toast } from "sonner";
 import { BackButton } from "@/components/BackButton/BackButton";
+import { useState } from "react";
+
+type Tab = "upcoming" | "past" | "cancelled";
+
+const TABS: { key: Tab; label: string }[] = [
+  { key: "upcoming", label: "예매 내역" },
+  { key: "past", label: "지난 내역" },
+  { key: "cancelled", label: "취소 내역" },
+];
+
+const EMPTY_TEXT: Record<Tab, string> = {
+  upcoming: "예매 내역이 없습니다.",
+  past: "지난 내역이 없습니다.",
+  cancelled: "취소 내역이 없습니다.",
+};
 
 const MyReservationsPage = () => {
   const queryClient = useQueryClient();
+  const [tab, setTab] = useState<Tab>("upcoming");
   const { data: reservations = [], isLoading } = useAxiosQuery<
     ReservationListItem[]
   >({
@@ -48,6 +64,17 @@ const MyReservationsPage = () => {
     return { label: "결제 대기", className: styles.badgePending };
   };
 
+  const now = new Date();
+  const filtered = reservations.filter((r) => {
+    if (tab === "cancelled") return r.status === "CANCELLED";
+    if (r.status !== "RESERVED") return false;
+
+    const isPast = r.scheduleStartAt
+      ? new Date(r.scheduleStartAt) < now
+      : false;
+    return tab === "past" ? isPast : !isPast;
+  });
+
   return (
     <main className={styles.container}>
       {isLoading ? (
@@ -56,8 +83,26 @@ const MyReservationsPage = () => {
         <>
           <h1 className={styles.title}>내 예약</h1>
           <BackButton />
-          {reservations.length === 0 && <p>예약 내역이 없습니다.</p>}
-          {reservations.map((r) => {
+
+          <div className={styles.tabs}>
+            {TABS.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setTab(t.key)}
+                className={
+                  tab === t.key
+                    ? `${styles.tab} ${styles.tabActive}`
+                    : styles.tab
+                }
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          {filtered.length === 0 && <p>{EMPTY_TEXT[tab]}</p>}
+          {filtered.map((r) => {
             const seats = r.seats ?? [];
             const seatText =
               seats.length > 0
@@ -90,7 +135,7 @@ const MyReservationsPage = () => {
                       {status.label}
                     </span>
                   </div>
-                  {r.status === "RESERVED" && (
+                  {tab === "upcoming" && (
                     <button
                       className={styles.cancelButton}
                       onClick={() => handleCancel(r.id)}

@@ -2,9 +2,10 @@ import Image from "next/image";
 import { Concert } from "@/types/concert";
 import styles from "./Concert.module.css";
 import Link from "next/link";
+import { parseKst } from "@/lib/date";
 
 export const ConcertCard = ({ concert }: { concert: Concert }) => {
-  const isOngoing = new Date(concert.salesStartAt) <= new Date();
+  const isOngoing = parseKst(concert.salesStartAt) <= new Date();
   return (
     <Link href={`/concerts/${concert.id}`} className={styles.card}>
       <div className={styles.imageWrapper}>
@@ -13,6 +14,7 @@ export const ConcertCard = ({ concert }: { concert: Concert }) => {
             src={concert.imageUrl}
             alt={concert.title}
             fill
+            sizes="(max-width: 480px) 50vw, 220px"
             className={styles.image}
           />
         )}
