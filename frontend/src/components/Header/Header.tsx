@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/authStore";
 import styles from "./Header.module.css";
+import { APP_NAME } from "@/constants/app";
 
 export const Header = () => {
   const router = useRouter();
@@ -18,7 +19,7 @@ export const Header = () => {
   return (
     <header className={styles.header}>
       <Link href="/" className={styles.logo}>
-        티켓콘
+        {APP_NAME}
       </Link>
       <nav className={styles.nav}>
         {user ? (

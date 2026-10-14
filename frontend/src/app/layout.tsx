@@ -4,9 +4,10 @@ import { Providers } from "./Providers";
 import Script from "next/script";
 import { Header } from "@/components/Header/Header";
 import { Toaster } from "sonner";
+import { APP_NAME } from "@/constants/app";
 
 export const metadata: Metadata = {
-  title: "티켓몬스터 | 콘서트 예매",
+  title: `${APP_NAME} | 콘서트 예매`,
   description: "실시간 좌석 예매, 콘서트 티켓 예매 플랫폼",
 };
 
